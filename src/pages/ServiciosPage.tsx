@@ -1,23 +1,31 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PRECIO_MAX, PRECIO_MIN } from '../constants'
-import { getBadgeClass, getTipoIcon, servicios } from '../data/servicios'
+import { getBadgeClass, getTipoIcon } from '../data/servicios'
 import { useCart } from '../contexts/CartContext'
 import { useToast } from '../contexts/ToastContext'
 import Breadcrumb from '../layout/Breadcrumb'
+import { obtenerCategorias, obtenerProductos } from '../services/storage'
 import { formatPrecio } from '../utils/format'
 
 export default function ServiciosPage() {
   const [filtroTipo, setFiltroTipo] = useState('todos')
-  const [filtroPrecioMax, setFiltroPrecioMax] = useState(PRECIO_MAX)
   const [filtroBusqueda, setFiltroBusqueda] = useState('')
   const { agregarAlCarrito, cupoDisponible } = useCart()
   const { showToast } = useToast()
 
+  const productos = useMemo(() => obtenerProductos(), [])
+  const categorias = useMemo(() => obtenerCategorias(), [])
+  const precioTope = useMemo(
+    () => Math.max(PRECIO_MAX, ...productos.map((p) => p.precio)),
+    [productos],
+  )
+  const [filtroPrecioMax, setFiltroPrecioMax] = useState(precioTope)
+
   const filtrados = useMemo(() => {
     let lista =
-      filtroTipo === 'todos' ? [...servicios] : servicios.filter((s) => s.tipo === filtroTipo)
-    lista = lista.filter((s) => s.precio >= PRECIO_MIN && s.precio <= filtroPrecioMax)
+      filtroTipo === 'todos' ? [...productos] : productos.filter((s) => s.tipo === filtroTipo)
+    lista = lista.filter((s) => s.precio <= filtroPrecioMax)
     if (filtroBusqueda.trim() !== '') {
       const q = filtroBusqueda.toLowerCase().trim()
       lista = lista.filter(
@@ -29,16 +37,16 @@ export default function ServiciosPage() {
       )
     }
     return lista
-  }, [filtroTipo, filtroPrecioMax, filtroBusqueda])
+  }, [productos, filtroTipo, filtroPrecioMax, filtroBusqueda])
 
   function restablecerFiltros() {
     setFiltroTipo('todos')
-    setFiltroPrecioMax(PRECIO_MAX)
+    setFiltroPrecioMax(precioTope)
     setFiltroBusqueda('')
   }
 
   function agregarDesdeCatalogo(codigo: string) {
-    const servicio = servicios.find((s) => s.codigo === codigo)
+    const servicio = productos.find((s) => s.codigo === codigo)
     if (!servicio) return
     const disponibles = cupoDisponible(codigo)
     if (disponibles <= 0) {
@@ -110,10 +118,11 @@ export default function ServiciosPage() {
                     onChange={(e) => setFiltroTipo(e.target.value)}
                   >
                     <option value="todos">Todas las categorías</option>
-                    <option value="Consulta">Consultas</option>
-                    <option value="Plan especializado">Planes</option>
-                    <option value="Evaluación">Evaluaciones</option>
-                    <option value="Taller grupal">Talleres</option>
+                    {categorias.map((c) => (
+                      <option key={c.id} value={c.nombre}>
+                        {c.nombre}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -128,7 +137,7 @@ export default function ServiciosPage() {
                     className="form-range flex-grow-1"
                     id="precio-max"
                     min={PRECIO_MIN}
-                    max={PRECIO_MAX}
+                    max={precioTope}
                     step={5000}
                     value={filtroPrecioMax}
                     aria-label="Precio máximo"

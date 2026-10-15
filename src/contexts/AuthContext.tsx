@@ -1,16 +1,19 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Sesion, Usuario } from '../types'
 import {
   agregarUsuario,
+  actualizarUsuario,
   borrarSesion,
   buscarUsuarioPorCorreo,
   estaBloqueado,
   guardarSesion,
   incrementarIntentos,
+  migrarUsuariosSinRol,
   obtenerIntentosRestantes,
   obtenerUsuarioLogueado,
   resetearIntentos,
+  sembrarAdminSiFalta,
 } from '../services/storage'
 
 interface ResultadoLogin {
@@ -23,6 +26,7 @@ interface AuthContextValue {
   iniciarSesion: (correo: string, contrasena: string) => ResultadoLogin
   cerrarSesion: () => void
   registrarUsuario: (usuario: Usuario) => void
+  actualizarPerfil: (datos: Partial<Usuario>) => void
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -31,8 +35,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [usuario, setUsuario] = useState<Sesion | null>(() => obtenerUsuarioLogueado())
   const navigate = useNavigate()
 
+  useEffect(() => {
+    migrarUsuariosSinRol()
+    sembrarAdminSiFalta()
+  }, [])
+
   function iniciarSesion(correoInput: string, contrasena: string): ResultadoLogin {
-    const correo = correoInput.trim()
+    const correo = correoInput.trim().toLowerCase()
 
     if (!correo || !contrasena) {
       return { exito: false, mensaje: 'Debes completar todos los campos' }
@@ -76,6 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       correo: usuarioEncontrado.correo,
       genero: usuarioEncontrado.genero,
       region: usuarioEncontrado.region,
+      rol: usuarioEncontrado.rol,
     }
 
     guardarSesion(usuarioSesion)
@@ -93,8 +103,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     agregarUsuario(nuevo)
   }
 
+  function actualizarPerfil(datos: Partial<Usuario>) {
+    if (!usuario) return
+    actualizarUsuario(usuario.correo, datos)
+    const usuarioActualizado = buscarUsuarioPorCorreo(datos.correo ?? usuario.correo)
+    if (usuarioActualizado) {
+      const nuevaSesion: Sesion = {
+        id: usuarioActualizado.id,
+        nombre: usuarioActualizado.nombre,
+        apellido: usuarioActualizado.apellido,
+        correo: usuarioActualizado.correo,
+        genero: usuarioActualizado.genero,
+        region: usuarioActualizado.region,
+        rol: usuarioActualizado.rol,
+      }
+      guardarSesion(nuevaSesion)
+      setUsuario(nuevaSesion)
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ usuario, iniciarSesion, cerrarSesion, registrarUsuario }}>
+    <AuthContext.Provider
+      value={{ usuario, iniciarSesion, cerrarSesion, registrarUsuario, actualizarPerfil }}
+    >
       {children}
     </AuthContext.Provider>
   )

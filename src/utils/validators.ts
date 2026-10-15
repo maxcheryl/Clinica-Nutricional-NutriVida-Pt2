@@ -8,7 +8,7 @@ export function validarContrasena(contrasena: string): boolean {
 }
 
 export function esDominioDuoc(correo: string): boolean {
-  return correo.endsWith('@duocuc.cl')
+  return correo.trim().toLowerCase().endsWith('@duocuc.cl')
 }
 
 export function calcularEdad(fechaNacimiento: string): number {

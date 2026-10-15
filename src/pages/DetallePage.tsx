@@ -1,9 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { getBadgeClass, getServicioPorCodigo, getTipoIcon } from '../data/servicios'
+import { getBadgeClass, getTipoIcon } from '../data/servicios'
 import { useCart } from '../contexts/CartContext'
 import { useToast } from '../contexts/ToastContext'
 import Breadcrumb from '../layout/Breadcrumb'
+import { buscarProductoPorCodigo } from '../services/storage'
 import { formatPrecio } from '../utils/format'
 
 const IMAGENES_TIPO: Record<string, string> = {
@@ -52,7 +53,7 @@ export default function DetallePage() {
   const { agregarAlCarrito, cupoDisponible } = useCart()
   const { showToast } = useToast()
 
-  const servicio = codigo ? getServicioPorCodigo(codigo) : undefined
+  const servicio = useMemo(() => (codigo ? buscarProductoPorCodigo(codigo) : undefined), [codigo])
   const cupos = servicio ? cupoDisponible(servicio.codigo) : 0
 
   useEffect(() => {

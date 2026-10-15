@@ -1,14 +1,19 @@
-export type TipoServicio = 'Consulta' | 'Plan especializado' | 'Evaluación' | 'Taller grupal'
+export type RolUsuario = 'administrador' | 'recepcionista' | 'cliente'
 
 export interface Servicio {
   codigo: string
-  tipo: TipoServicio
+  tipo: string
   nombre: string
   duracion: string
   modalidad: string
   precio: number
   cuposIniciales: number
   descripcion: string
+}
+
+export interface Categoria {
+  id: string
+  nombre: string
 }
 
 export type Genero = 'Mujer' | 'Hombre' | 'Otro' | 'NoDice'
@@ -23,6 +28,8 @@ export interface Usuario {
   genero: Genero | ''
   region: string
   direccion: string
+  rol: RolUsuario
+  avatar?: string
 }
 
 export interface Sesion {
@@ -32,6 +39,7 @@ export interface Sesion {
   correo: string
   genero: Genero | ''
   region: string
+  rol: RolUsuario
 }
 
 export interface CarritoItem extends Servicio {

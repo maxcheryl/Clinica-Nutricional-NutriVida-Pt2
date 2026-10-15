@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { getBadgeClass, getTipoIcon, servicios } from '../data/servicios'
+import { getBadgeClass, getTipoIcon } from '../data/servicios'
 import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
 import { useToast } from '../contexts/ToastContext'
 import Breadcrumb from '../layout/Breadcrumb'
+import { buscarProductoPorCodigo } from '../services/storage'
 import AppModal from '../ui/AppModal'
 import { formatPrecio } from '../utils/format'
 
@@ -27,7 +28,7 @@ export default function CarritoPage() {
       showToast('No hay más cupos disponibles', 'warning')
       return
     }
-    const servicio = servicios.find((s) => s.codigo === codigo)
+    const servicio = buscarProductoPorCodigo(codigo)
     if (servicio) agregarAlCarrito(servicio)
   }
 

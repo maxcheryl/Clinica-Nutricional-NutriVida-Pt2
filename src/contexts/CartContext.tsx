@@ -2,6 +2,7 @@ import { createContext, useContext, useState } from 'react'
 import type { CarritoItem, ReservadosMap, Servicio } from '../types'
 import {
   agregarAlCarrito as storageAgregar,
+  buscarProductoPorCodigo,
   eliminarDelCarrito as storageEliminar,
   guardarReservados,
   obtenerCarrito,
@@ -9,7 +10,6 @@ import {
   reducirCantidad as storageReducir,
   vaciarCarrito as storageVaciar,
 } from '../services/storage'
-import { getServicioPorCodigo } from '../data/servicios'
 
 interface CartContextValue {
   carrito: CarritoItem[]
@@ -32,7 +32,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const totalUnidades = carrito.reduce((sum, item) => sum + item.cantidad, 0)
 
   function cupoDisponible(codigo: string): number {
-    const servicio = getServicioPorCodigo(codigo)
+    const servicio = buscarProductoPorCodigo(codigo)
     if (!servicio) return 0
     const enCarrito = carrito.find((i) => i.codigo === codigo)?.cantidad ?? 0
     const yaReservados = reservados[codigo] || 0

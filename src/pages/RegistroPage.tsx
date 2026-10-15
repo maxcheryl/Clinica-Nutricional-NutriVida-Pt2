@@ -4,6 +4,7 @@ import { OPCIONES_GENERO, OPCIONES_REGION } from '../constants'
 import { useAuth } from '../contexts/AuthContext'
 import { buscarUsuarioPorCorreo } from '../services/storage'
 import type { Genero } from '../types'
+import PasswordInput from '../ui/PasswordInput'
 import { calcularEdad, esDominioDuoc, validarContrasena } from '../utils/validators'
 
 export default function RegistroPage() {
@@ -96,6 +97,7 @@ export default function RegistroPage() {
       genero,
       region,
       direccion,
+      rol: 'cliente',
     })
 
     setMensajeRegistro('Registro realizado con éxito')
@@ -182,26 +184,22 @@ export default function RegistroPage() {
                     <label htmlFor="pass" className="form-label">
                       Contraseña<span className="obligatorio">*</span>
                     </label>
-                    <input
-                      type="password"
-                      className="form-control"
+                    <PasswordInput
                       id="pass"
                       placeholder="••••••••"
                       value={contrasena}
-                      onChange={(e) => setContrasena(e.target.value)}
+                      onChange={setContrasena}
                     />
                   </div>
                   <div className="col-md-6">
                     <label htmlFor="confirmPass" className="form-label">
                       Confirmar contraseña<span className="obligatorio">*</span>
                     </label>
-                    <input
-                      type="password"
-                      className="form-control"
+                    <PasswordInput
                       id="confirmPass"
                       placeholder="••••••••"
                       value={confirmarContrasena}
-                      onChange={(e) => setConfirmarContrasena(e.target.value)}
+                      onChange={setConfirmarContrasena}
                     />
                   </div>
                   <div

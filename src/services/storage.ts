@@ -1,19 +1,24 @@
 import {
+  ADMIN_INICIAL_CORREO,
+  ADMIN_INICIAL_PASSWORD,
   CLAVE_CARRITO,
+  CLAVE_CATEGORIAS,
   CLAVE_INTENTOS,
+  CLAVE_PRODUCTOS,
   CLAVE_RESERVADOS,
   CLAVE_SESION,
   CLAVE_USUARIOS,
   MAX_INTENTOS,
 } from '../constants'
-import { getServicioPorCodigo } from '../data/servicios'
-import type { CarritoItem, IntentosMap, ReservadosMap, Servicio, Sesion, Usuario } from '../types'
+import { servicios as serviciosSeed } from '../data/servicios'
+import type { CarritoItem, Categoria, IntentosMap, ReservadosMap, Servicio, Sesion, Usuario } from '../types'
 
 // ==================== USUARIOS ====================
 export function obtenerUsuarios(): Usuario[] {
   const datos = localStorage.getItem(CLAVE_USUARIOS)
   if (datos === null) return []
-  return JSON.parse(datos) as Usuario[]
+  const usuarios = JSON.parse(datos) as Usuario[]
+  return usuarios.map((u) => ({ ...u, rol: u.rol ?? 'cliente' }))
 }
 
 export function guardarUsuarios(usuarios: Usuario[]): void {
@@ -28,7 +33,44 @@ export function agregarUsuario(usuario: Usuario): void {
 
 export function buscarUsuarioPorCorreo(correo: string): Usuario | undefined {
   const usuarios = obtenerUsuarios()
-  return usuarios.find((usuario) => usuario.correo === correo)
+  return usuarios.find((usuario) => usuario.correo.toLowerCase() === correo.toLowerCase())
+}
+
+export function actualizarUsuario(correo: string, datos: Partial<Usuario>): void {
+  const usuarios = obtenerUsuarios()
+  const indice = usuarios.findIndex((u) => u.correo === correo)
+  if (indice === -1) return
+  usuarios[indice] = { ...usuarios[indice], ...datos }
+  guardarUsuarios(usuarios)
+}
+
+export function eliminarUsuario(correo: string): void {
+  const usuarios = obtenerUsuarios().filter((u) => u.correo !== correo)
+  guardarUsuarios(usuarios)
+}
+
+export function migrarUsuariosSinRol(): void {
+  const datos = localStorage.getItem(CLAVE_USUARIOS)
+  if (datos === null) return
+  const usuarios = JSON.parse(datos) as Usuario[]
+  const migrados = usuarios.map((u) => ({ ...u, rol: u.rol ?? 'cliente' }))
+  guardarUsuarios(migrados)
+}
+
+export function sembrarAdminSiFalta(): void {
+  if (buscarUsuarioPorCorreo(ADMIN_INICIAL_CORREO)) return
+  agregarUsuario({
+    id: crypto.randomUUID(),
+    nombre: 'Admin',
+    apellido: 'NutriVida',
+    correo: ADMIN_INICIAL_CORREO,
+    fechaNacimiento: '1990-01-01',
+    contrasena: ADMIN_INICIAL_PASSWORD,
+    genero: 'NoDice',
+    region: 'Metropolitana',
+    direccion: 'Milano 01591, Temuco',
+    rol: 'administrador',
+  })
 }
 
 // ==================== SESIÓN ====================
@@ -87,6 +129,88 @@ export function obtenerIntentosRestantes(correo: string): number {
   const intentos = obtenerIntentos()
   if (!intentos[correo]) return MAX_INTENTOS
   return MAX_INTENTOS - intentos[correo].intentos
+}
+
+// ==================== PRODUCTOS ====================
+export function obtenerProductos(): Servicio[] {
+  const datos = localStorage.getItem(CLAVE_PRODUCTOS)
+  if (datos === null) {
+    guardarProductos(serviciosSeed)
+    return [...serviciosSeed]
+  }
+  return JSON.parse(datos) as Servicio[]
+}
+
+export function guardarProductos(productos: Servicio[]): void {
+  localStorage.setItem(CLAVE_PRODUCTOS, JSON.stringify(productos))
+}
+
+export function agregarProducto(producto: Servicio): void {
+  const productos = obtenerProductos()
+  productos.push(producto)
+  guardarProductos(productos)
+}
+
+export function actualizarProducto(codigo: string, datos: Partial<Servicio>): void {
+  const productos = obtenerProductos()
+  const indice = productos.findIndex((p) => p.codigo === codigo)
+  if (indice === -1) return
+  productos[indice] = { ...productos[indice], ...datos }
+  guardarProductos(productos)
+}
+
+export function eliminarProducto(codigo: string): void {
+  const productos = obtenerProductos().filter((p) => p.codigo !== codigo)
+  guardarProductos(productos)
+}
+
+export function buscarProductoPorCodigo(codigo: string): Servicio | undefined {
+  return obtenerProductos().find((p) => p.codigo === codigo)
+}
+
+// ==================== CATEGORÍAS ====================
+const CATEGORIAS_SEED: Categoria[] = [
+  { id: crypto.randomUUID(), nombre: 'Consulta' },
+  { id: crypto.randomUUID(), nombre: 'Plan especializado' },
+  { id: crypto.randomUUID(), nombre: 'Evaluación' },
+  { id: crypto.randomUUID(), nombre: 'Taller grupal' },
+]
+
+export function obtenerCategorias(): Categoria[] {
+  const datos = localStorage.getItem(CLAVE_CATEGORIAS)
+  if (datos === null) {
+    guardarCategorias(CATEGORIAS_SEED)
+    return [...CATEGORIAS_SEED]
+  }
+  return JSON.parse(datos) as Categoria[]
+}
+
+export function guardarCategorias(categorias: Categoria[]): void {
+  localStorage.setItem(CLAVE_CATEGORIAS, JSON.stringify(categorias))
+}
+
+export function agregarCategoria(nombre: string): void {
+  const categorias = obtenerCategorias()
+  categorias.push({ id: crypto.randomUUID(), nombre })
+  guardarCategorias(categorias)
+}
+
+export function actualizarCategoria(id: string, nombre: string): void {
+  const categorias = obtenerCategorias()
+  const indice = categorias.findIndex((c) => c.id === id)
+  if (indice === -1) return
+  categorias[indice] = { ...categorias[indice], nombre }
+  guardarCategorias(categorias)
+}
+
+export function eliminarCategoria(id: string): boolean {
+  const categorias = obtenerCategorias()
+  const categoria = categorias.find((c) => c.id === id)
+  if (!categoria) return false
+  const enUso = obtenerProductos().some((p) => p.tipo === categoria.nombre)
+  if (enUso) return false
+  guardarCategorias(categorias.filter((c) => c.id !== id))
+  return true
 }
 
 // ==================== CARRITO ====================
@@ -159,7 +283,7 @@ export function guardarReservados(reservados: ReservadosMap): void {
 }
 
 export function obtenerCupoDisponible(codigo: string): number {
-  const servicio = getServicioPorCodigo(codigo)
+  const servicio = buscarProductoPorCodigo(codigo)
   if (!servicio) return 0
   const enCarrito = cantidadEnCarrito(codigo)
   const reservados = obtenerReservados()[codigo] || 0

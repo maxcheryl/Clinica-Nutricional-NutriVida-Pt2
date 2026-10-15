@@ -4,10 +4,12 @@ import Navbar from './Navbar'
 
 export default function PageLayout() {
   return (
-    <>
+    <div className="page-wrapper">
       <Navbar />
-      <Outlet />
+      <div className="page-content">
+        <Outlet />
+      </div>
       <Footer />
-    </>
+    </div>
   )
 }

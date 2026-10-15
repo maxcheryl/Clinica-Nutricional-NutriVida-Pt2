@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import PasswordInput from '../ui/PasswordInput'
 
 export default function LoginPage() {
   const [correo, setCorreo] = useState('')
@@ -51,13 +52,11 @@ export default function LoginPage() {
                   <label htmlFor="inputPass" className="form-label">
                     Contraseña
                   </label>
-                  <input
-                    type="password"
-                    className="form-control"
+                  <PasswordInput
                     id="inputPass"
                     placeholder="••••••••"
                     value={contrasena}
-                    onChange={(e) => setContrasena(e.target.value)}
+                    onChange={setContrasena}
                   />
                 </div>
                 <div className="d-grid mb-3">

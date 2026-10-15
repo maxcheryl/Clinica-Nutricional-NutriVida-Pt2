@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
+import { esAdmin, esRecepcionista } from '../utils/permissions'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -83,15 +84,39 @@ export default function Navbar() {
             <ul className="navbar-nav">
               {usuario ? (
                 <>
-                  <li className="nav-item" id="infoUsuario">
-                    <span className="nav-link" id="nombreUsuario">
+                  {esAdmin(usuario) && (
+                    <li className="nav-item">
+                      <Link
+                        className={`nav-link${location.pathname === '/panelAdministracion' ? ' active' : ''}`}
+                        to="/panelAdministracion"
+                      >
+                        <i className="bi bi-speedometer2 me-1" />
+                        Panel
+                      </Link>
+                    </li>
+                  )}
+                  {esRecepcionista(usuario) && (
+                    <li className="nav-item">
+                      <Link
+                        className={`nav-link${location.pathname === '/gestion' ? ' active' : ''}`}
+                        to="/gestion"
+                      >
+                        <i className="bi bi-box-seam me-1" />
+                        Gestión
+                      </Link>
+                    </li>
+                  )}
+                  <li className="nav-item">
+                    <Link
+                      className={`nav-link${location.pathname === '/perfil' ? ' active' : ''}`}
+                      to="/perfil"
+                    >
                       Hola, {usuario.nombre}
-                    </span>
+                    </Link>
                   </li>
-                  <li className="nav-item mb-2" id="botonCerrarSesion">
+                  <li className="nav-item mb-2">
                     <button
                       type="button"
-                      id="btnCerrarSesion"
                       className="btn btn-success ms-lg-2"
                       onClick={cerrarSesion}
                     >
@@ -100,7 +125,7 @@ export default function Navbar() {
                   </li>
                 </>
               ) : (
-                <li className="nav-item" id="botonIniciarSesion">
+                <li className="nav-item">
                   <Link className="nav-link" to="/login">
                     Iniciar Sesión
                   </Link>

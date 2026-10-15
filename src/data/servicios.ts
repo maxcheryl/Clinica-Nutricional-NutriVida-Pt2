@@ -1,4 +1,4 @@
-import type { Servicio, TipoServicio } from '../types'
+import type { Servicio } from '../types'
 
 export const servicios: Servicio[] = [
   // CONSULTAS
@@ -205,7 +205,7 @@ export function getServicioPorCodigo(codigo: string): Servicio | undefined {
   return servicios.find((s) => s.codigo === codigo)
 }
 
-export function getBadgeClass(tipo: TipoServicio | string): string {
+export function getBadgeClass(tipo: string): string {
   const classes: Record<string, string> = {
     Consulta: 'bg-success text-white',
     'Plan especializado': 'bg-primary text-white',
@@ -215,7 +215,7 @@ export function getBadgeClass(tipo: TipoServicio | string): string {
   return classes[tipo] || 'bg-secondary text-white'
 }
 
-export function getTipoIcon(tipo: TipoServicio | string): string {
+export function getTipoIcon(tipo: string): string {
   const icons: Record<string, string> = {
     Consulta: 'bi-person-heart',
     'Plan especializado': 'bi-journal-medical',

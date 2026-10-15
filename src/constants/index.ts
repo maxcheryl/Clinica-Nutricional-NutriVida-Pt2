@@ -3,6 +3,8 @@ export const CLAVE_SESION = 'usuarioLogueado'
 export const CLAVE_INTENTOS = 'nutrivida_intentos'
 export const CLAVE_CARRITO = 'nutrivida_carrito'
 export const CLAVE_RESERVADOS = 'nutrivida_reservados'
+export const CLAVE_PRODUCTOS = 'nutrivida_productos'
+export const CLAVE_CATEGORIAS = 'nutrivida_categorias'
 
 export const MAX_INTENTOS = 3
 
@@ -11,6 +13,15 @@ export const PRECIO_MAX = 170000
 export const PRECIO_STEP = 5000
 
 export const DOMINIO_CORREO = '@duocuc.cl'
+
+export const ADMIN_INICIAL_CORREO = 'admin@duocuc.cl'
+export const ADMIN_INICIAL_PASSWORD = 'Admin12345'
+
+export const OPCIONES_ROL = [
+  { valor: 'administrador', etiqueta: 'Administrador' },
+  { valor: 'recepcionista', etiqueta: 'Recepcionista' },
+  { valor: 'cliente', etiqueta: 'Cliente' },
+] as const
 
 export const OPCIONES_GENERO = [
   { valor: 'Mujer', etiqueta: 'Mujer' },

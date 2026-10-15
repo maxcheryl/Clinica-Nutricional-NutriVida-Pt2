@@ -46,6 +46,8 @@
 }
 
 .navbar .btn-success {
+    display: inline-flex;
+    align-items: center;
     background-color: var(--accent);
     border-color: var(--accent);
     color: var(--white);
@@ -59,4 +61,25 @@
     background-color: var(--accent-dark);
     border-color: var(--accent-dark);
     color: var(--white);
+}
+
+/* Alineación vertical de los menús izquierdo/derecho (solo desktop).
+   Bootstrap usa align-items: center en .navbar-collapse, lo que centra
+   cada <ul> por separado y desalinea izquierda/derecha cuando tienen
+   alturas distintas. Stretch + centrado por item lo resuelve. */
+@media (min-width: 992px) {
+    .navbar .navbar-collapse {
+        align-items: stretch;
+    }
+
+    .navbar .navbar-collapse .nav-item {
+        display: flex;
+        align-items: center;
+    }
+
+    /* El mb-2 es solo espaciado del menú móvil apilado; en desktop
+       desalineaba "Cerrar sesión" 4px sobre el resto (viene con !important de BS) */
+    .navbar .navbar-collapse .nav-item.mb-2 {
+        margin-bottom: 0 !important;
+    }
 }
