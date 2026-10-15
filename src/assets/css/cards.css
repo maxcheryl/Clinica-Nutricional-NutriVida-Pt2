@@ -1,0 +1,452 @@
+/* ==================== CARDS ==================== */
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    text-align: center;
+    color: var(--text-light);
+    margin-bottom: 3rem;
+}
+
+.card-servicio {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: var(--transition);
+    overflow: hidden;
+    height: 100%;
+    background-color: var(--white);
+}
+
+.card-servicio:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.card-servicio .card-body {
+    padding: 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-servicio .card-icon {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+}
+
+.card-servicio .card-title {
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
+
+.card-servicio .card-text {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    flex: 1;
+}
+
+.card-servicio .card-price {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--secondary-dark);
+    margin-bottom: 1rem;
+}
+
+.card-servicio .btn {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: var(--white);
+    border-radius: 25px;
+    padding: 0.4rem 1.2rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.card-servicio .btn:hover {
+    background-color: var(--accent-dark);
+    border-color: var(--accent-dark);
+}
+
+/* ==================== HISTORIA ==================== */
+.history-text {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--text);
+}
+
+.history-img {
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+}
+
+.history-img:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* ==================== EQUIPO ==================== */
+.card-equipo {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background-color: var(--white);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.card-equipo:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--secondary);
+}
+
+.card-equipo .card-body {
+    padding: 2rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+}
+
+.card-equipo .equipo-avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #f0f4f2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.2rem;
+    transition: var(--transition);
+}
+
+.card-equipo:hover .equipo-avatar {
+    border-color: var(--secondary);
+    transform: scale(1.05);
+}
+
+.card-equipo .card-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+}
+
+.card-equipo .card-text {
+    font-size: 0.88rem;
+    color: var(--text-light);
+    line-height: 1.45;
+    margin-bottom: 0;
+}
+
+/* ==================== CONTACTO ==================== */
+.card-contacto {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background-color: var(--white);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.card-contacto:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.contacto-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.contact-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(79, 99, 212, 0.08);
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+
+.contact-item:hover .contact-icon {
+    background-color: var(--primary);
+    color: var(--white);
+    transform: scale(1.05);
+}
+
+.contact-info strong {
+    display: block;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    margin-bottom: 2px;
+}
+
+.contact-info p {
+    margin-bottom: 0;
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+
+.contact-info a {
+    color: var(--text-light);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.contact-info a:hover {
+    color: var(--primary);
+}
+
+/* ==================== FORMULARIOS ==================== */
+.card-contacto .form-label,
+.card-auth .form-label {
+    font-weight: 500;
+    font-size: 0.88rem;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+}
+
+.card-contacto .form-control,
+.card-auth .form-control,
+.card-auth .form-select {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.65rem 0.95rem;
+    font-size: 0.92rem;
+    background-color: #fafbfc;
+    transition: var(--transition);
+}
+
+.card-contacto .form-control:focus {
+    background-color: var(--white);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 99, 212, 0.12);
+}
+
+.card-auth .form-control:focus,
+.card-auth .form-select:focus {
+    background-color: var(--white);
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(116, 192, 86, 0.15);
+}
+
+.btn-contacto {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+    color: var(--white);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    transition: var(--transition);
+}
+
+.btn-contacto:hover {
+    background-color: var(--secondary-dark);
+    border-color: var(--secondary-dark);
+    color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(116, 192, 86, 0.3);
+}
+
+/* ==================== MAPA RESPONSIVO ==================== */
+.map-responsive {
+    position: relative;
+    width: 100%;
+    height: 250px;
+}
+
+.map-responsive iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+}
+
+/* ==================== PÁGINA SERVICIOS ==================== */
+.servicios-hero {
+    border-bottom: 1px solid var(--border);
+    padding: 3.5rem 0 2.5rem;
+}
+
+.card-catalogo {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background-color: var(--white);
+    box-shadow: var(--shadow);
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.card-catalogo:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08) !important;
+    border-color: rgba(116, 192, 86, 0.5);
+}
+
+.card-catalogo .card-body {
+    text-align: left;
+}
+
+/* ==================== RANGO DE PRECIO ==================== */
+.form-range::-webkit-slider-thumb {
+    background-color: var(--secondary);
+}
+
+.form-range::-webkit-slider-thumb:active {
+    background-color: var(--secondary-dark);
+}
+
+.form-range::-moz-range-thumb {
+    background-color: var(--secondary);
+}
+
+.form-range::-moz-range-thumb:active {
+    background-color: var(--secondary-dark);
+}
+
+/* ==================== DETALLE DE SERVICIO ==================== */
+.card-detalle {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background-color: var(--white);
+    box-shadow: var(--shadow);
+}
+
+.card-detalle .card-body {
+    text-align: left;
+}
+
+.detalle-img-frame {
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background-color: #f8faf9;
+}
+
+/* ==================== AUTH PAGES ==================== */
+.card-auth {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background-color: var(--white);
+    box-shadow: var(--shadow-md);
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.card-auth .card-body {
+    padding: 2.5rem;
+}
+
+.auth-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(116, 192, 86, 0.12);
+    color: var(--secondary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 1.2rem;
+}
+
+.auth-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.3rem;
+}
+
+.auth-subtitle {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-bottom: 1.8rem;
+}
+
+.card-auth .btn-success {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.7rem;
+    transition: var(--transition);
+}
+
+.card-auth .btn-success:hover {
+    background-color: var(--secondary-dark);
+    border-color: var(--secondary-dark);
+    transform: translateY(-1px);
+}
+
+.auth-link {
+    color: var(--secondary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.auth-link:hover {
+    color: var(--secondary-dark);
+    text-decoration: underline;
+}
+
+.card-auth .form-check-input:checked {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+}
+
+.card-auth .form-check {
+    margin-top: 0.2rem;
+}
+
+/* ==================== UTILIDADES REUTILIZABLES ==================== */
+
+/* Asterisco para campos obligatorios */
+.form-label .obligatorio {
+    color: #dc3545;
+    margin-left: 2px;
+}
+
+/* Icono circular para modales y badges (70px), icono con check verde*/
+.icon-circle {
+    width: 70px;
+    height: 70px;
+}
+
+/* Icono circular pequeño para inline items como tags de categoría (44px), icono de chat*/
+.icon-circle-sm {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+}
+
+/* Container de toast notifications - asegura z-index sobre modales, notificacion flotante*/
+.toast-container {
+    z-index: 1100;
+}
+

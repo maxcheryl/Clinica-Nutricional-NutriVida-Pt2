@@ -1,0 +1,39 @@
+export const CLAVE_USUARIOS = 'nutrivida_usuarios'
+export const CLAVE_SESION = 'usuarioLogueado'
+export const CLAVE_INTENTOS = 'nutrivida_intentos'
+export const CLAVE_CARRITO = 'nutrivida_carrito'
+export const CLAVE_RESERVADOS = 'nutrivida_reservados'
+
+export const MAX_INTENTOS = 3
+
+export const PRECIO_MIN = 10000
+export const PRECIO_MAX = 170000
+export const PRECIO_STEP = 5000
+
+export const DOMINIO_CORREO = '@duocuc.cl'
+
+export const OPCIONES_GENERO = [
+  { valor: 'Mujer', etiqueta: 'Mujer' },
+  { valor: 'Hombre', etiqueta: 'Hombre' },
+  { valor: 'Otro', etiqueta: 'Otro' },
+  { valor: 'NoDice', etiqueta: 'Prefiero no decir' },
+] as const
+
+export const OPCIONES_REGION = [
+  { valor: 'Arica', etiqueta: 'Arica y Parinacota' },
+  { valor: 'Tarapaca', etiqueta: 'Tarapacá' },
+  { valor: 'Antofagasta', etiqueta: 'Antofagasta' },
+  { valor: 'Atacama', etiqueta: 'Atacama' },
+  { valor: 'Coquimbo', etiqueta: 'Coquimbo' },
+  { valor: 'Valparaiso', etiqueta: 'Valparaíso' },
+  { valor: 'Metropolitana', etiqueta: 'Metropolitana de Santiago' },
+  { valor: "O'Higgins", etiqueta: 'Libertador General Bernardo O\u2019Higgins' },
+  { valor: 'Maule', etiqueta: 'Maule' },
+  { valor: 'Nuble', etiqueta: 'Ñuble' },
+  { valor: 'Biobio', etiqueta: 'Biobío' },
+  { valor: 'Araucania', etiqueta: 'La Araucanía' },
+  { valor: 'Rios', etiqueta: 'Los Ríos' },
+  { valor: 'Lagos', etiqueta: 'Los Lagos' },
+  { valor: 'Aysen', etiqueta: 'Aysén del General Carlos Ibáñez del Campo' },
+  { valor: 'Magallanes', etiqueta: 'Magallanes y de la Antártica Chilena' },
+] as const

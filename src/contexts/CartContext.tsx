@@ -1,0 +1,97 @@
+import { createContext, useContext, useState } from 'react'
+import type { CarritoItem, ReservadosMap, Servicio } from '../types'
+import {
+  agregarAlCarrito as storageAgregar,
+  eliminarDelCarrito as storageEliminar,
+  guardarReservados,
+  obtenerCarrito,
+  obtenerReservados,
+  reducirCantidad as storageReducir,
+  vaciarCarrito as storageVaciar,
+} from '../services/storage'
+import { getServicioPorCodigo } from '../data/servicios'
+
+interface CartContextValue {
+  carrito: CarritoItem[]
+  reservados: ReservadosMap
+  totalUnidades: number
+  cupoDisponible: (codigo: string) => number
+  agregarAlCarrito: (servicio: Servicio) => void
+  reducirCantidad: (codigo: string) => void
+  eliminarDelCarrito: (codigo: string) => void
+  vaciarCarrito: () => void
+  confirmarReserva: () => void
+}
+
+const CartContext = createContext<CartContextValue | null>(null)
+
+export function CartProvider({ children }: { children: React.ReactNode }) {
+  const [carrito, setCarrito] = useState<CarritoItem[]>(() => obtenerCarrito())
+  const [reservados, setReservados] = useState<ReservadosMap>(() => obtenerReservados())
+
+  const totalUnidades = carrito.reduce((sum, item) => sum + item.cantidad, 0)
+
+  function cupoDisponible(codigo: string): number {
+    const servicio = getServicioPorCodigo(codigo)
+    if (!servicio) return 0
+    const enCarrito = carrito.find((i) => i.codigo === codigo)?.cantidad ?? 0
+    const yaReservados = reservados[codigo] || 0
+    return servicio.cuposIniciales - enCarrito - yaReservados
+  }
+
+  function agregarAlCarrito(servicio: Servicio) {
+    storageAgregar(servicio)
+    setCarrito(obtenerCarrito())
+  }
+
+  function reducirCantidad(codigo: string) {
+    storageReducir(codigo)
+    setCarrito(obtenerCarrito())
+  }
+
+  function eliminarDelCarrito(codigo: string) {
+    storageEliminar(codigo)
+    setCarrito(obtenerCarrito())
+  }
+
+  function vaciarCarrito() {
+    storageVaciar()
+    setCarrito([])
+  }
+
+  // Réplica exacta: no valida carrito vacío ni revalida cupos
+  function confirmarReserva() {
+    const nuevosReservados = { ...reservados }
+    carrito.forEach((item) => {
+      nuevosReservados[item.codigo] = (nuevosReservados[item.codigo] || 0) + item.cantidad
+    })
+    guardarReservados(nuevosReservados)
+    setReservados(nuevosReservados)
+    storageVaciar()
+    setCarrito([])
+  }
+
+  return (
+    <CartContext.Provider
+      value={{
+        carrito,
+        reservados,
+        totalUnidades,
+        cupoDisponible,
+        agregarAlCarrito,
+        reducirCantidad,
+        eliminarDelCarrito,
+        vaciarCarrito,
+        confirmarReserva,
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  )
+}
+
+export function useCart(): CartContextValue {
+  const ctx = useContext(CartContext)
+  if (!ctx) throw new Error('useCart debe usarse dentro de CartProvider')
+  return ctx
+}

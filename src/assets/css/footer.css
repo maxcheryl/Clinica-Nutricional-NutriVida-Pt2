@@ -1,0 +1,67 @@
+/* ==================== FOOTER ==================== */
+.footer {
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
+    padding: 4rem 0 2rem;
+    font-size: 0.9rem;
+}
+
+.footer-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 1.2rem;
+}
+
+.footer-brand-box {
+    max-width: 100%;
+}
+
+.footer-text {
+    line-height: 1.7;
+    color: var(--footer-text);
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 0.6rem;
+}
+
+.footer-links a {
+    color: var(--footer-text-muted);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-links a:hover {
+    color: var(--white);
+}
+
+.footer-contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-contact li {
+    margin-bottom: 0.6rem;
+    color: var(--footer-text-muted);
+}
+
+.footer-divider {
+    border-color: var(--footer-border);
+    margin: 2rem 0 1.5rem;
+}
+
+.footer-copyright {
+    text-align: center;
+    color: var(--white);
+    font-size: 0.85rem;
+    margin: 0;
+}
