@@ -4,10 +4,13 @@ import {
   agregarUsuario,
   actualizarProducto,
   buscarUsuarioPorCorreo,
+  cuposRetenidos,
+  obtenerCupoDisponible,
   obtenerProductos,
 } from '../services/storage'
 import type { Servicio } from '../types'
 import PasswordInput from '../ui/PasswordInput'
+import StockBadge from '../ui/StockBadge'
 import { formatPrecio } from '../utils/format'
 import { validarContrasena, esDominioDuoc } from '../utils/validators'
 
@@ -37,7 +40,7 @@ export default function GestionPage() {
   function guardarStock(codigo: string) {
     const nuevoStock = stockEditado[codigo]
     if (nuevoStock === undefined || nuevoStock < 0) return
-    actualizarProducto(codigo, { cuposIniciales: nuevoStock })
+    actualizarProducto(codigo, { cuposIniciales: nuevoStock + cuposRetenidos(codigo) })
     setProductos(obtenerProductos())
     setStockEditado({ ...stockEditado, [codigo]: undefined as unknown as number })
     showToast('Stock actualizado correctamente', 'success')
@@ -157,14 +160,19 @@ export default function GestionPage() {
                           <td>{p.tipo}</td>
                           <td>{formatPrecio(p.precio)}</td>
                           <td>
-                            <span className="badge bg-secondary rounded-pill">{p.cuposIniciales}</span>
+                            <StockBadge
+                              disponible={Math.max(0, obtenerCupoDisponible(p.codigo))}
+                            />
                           </td>
                           <td style={{ width: '120px' }}>
                             <input
                               type="number"
                               className="form-control form-control-sm"
                               min={0}
-                              value={stockEditado[p.codigo] ?? p.cuposIniciales}
+                              value={
+                                stockEditado[p.codigo] ??
+                                Math.max(0, obtenerCupoDisponible(p.codigo))
+                              }
                               onChange={(e) => manejarStockChange(p.codigo, Number(e.target.value))}
                             />
                           </td>

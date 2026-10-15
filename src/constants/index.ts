@@ -11,6 +11,7 @@ export const MAX_INTENTOS = 3
 export const PRECIO_MIN = 10000
 export const PRECIO_MAX = 170000
 export const PRECIO_STEP = 5000
+export const UMBRAL_POCOS_CUPOS = 2
 
 export const DOMINIO_CORREO = '@duocuc.cl'
 

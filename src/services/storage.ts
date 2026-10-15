@@ -289,3 +289,7 @@ export function obtenerCupoDisponible(codigo: string): number {
   const reservados = obtenerReservados()[codigo] || 0
   return servicio.cuposIniciales - enCarrito - reservados
 }
+
+export function cuposRetenidos(codigo: string): number {
+  return cantidadEnCarrito(codigo) + (obtenerReservados()[codigo] || 0)
+}

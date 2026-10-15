@@ -10,16 +10,19 @@ import {
   actualizarProducto,
   actualizarUsuario,
   buscarUsuarioPorCorreo,
+  cuposRetenidos,
   eliminarCategoria,
   eliminarProducto,
   eliminarUsuario,
   obtenerCategorias,
+  obtenerCupoDisponible,
   obtenerProductos,
   obtenerUsuarios,
 } from '../services/storage'
 import type { Categoria, RolUsuario, Servicio, Usuario } from '../types'
 import AppModal from '../ui/AppModal'
 import PasswordInput from '../ui/PasswordInput'
+import StockBadge from '../ui/StockBadge'
 import { formatPrecio } from '../utils/format'
 import { validarContrasena, esDominioDuoc } from '../utils/validators'
 
@@ -191,7 +194,7 @@ export default function PanelAdministracionPage() {
       duracion: p.duracion,
       modalidad: p.modalidad,
       precio: p.precio,
-      cuposIniciales: p.cuposIniciales,
+      cuposIniciales: Math.max(0, obtenerCupoDisponible(p.codigo)),
       descripcion: p.descripcion,
     })
     setErrorForm(null)
@@ -213,7 +216,10 @@ export default function PanelAdministracionPage() {
     }
 
     if (productoEditando) {
-      actualizarProducto(productoEditando.codigo, formProducto)
+      actualizarProducto(productoEditando.codigo, {
+        ...formProducto,
+        cuposIniciales: formProducto.cuposIniciales + cuposRetenidos(productoEditando.codigo),
+      })
       showToast('Producto actualizado correctamente', 'success')
     } else {
       const prefijo = formProducto.tipo.charAt(0).toUpperCase() + formProducto.tipo.charAt(1)
@@ -425,7 +431,11 @@ export default function PanelAdministracionPage() {
                           <td>{p.nombre}</td>
                           <td>{p.tipo}</td>
                           <td>{formatPrecio(p.precio)}</td>
-                          <td>{p.cuposIniciales}</td>
+                          <td>
+                            <StockBadge
+                              disponible={Math.max(0, obtenerCupoDisponible(p.codigo))}
+                            />
+                          </td>
                           <td className="text-end">
                             <button
                               className="btn btn-sm btn-outline-primary rounded-pill me-2"
@@ -708,6 +718,7 @@ export default function PanelAdministracionPage() {
                         setFormProducto({ ...formProducto, cuposIniciales: Number(e.target.value) })
                       }
                     />
+                    <small className="text-muted">Cupos disponibles para reservar</small>
                   </div>
                   <div className="col-md-4">
                     <label className="form-label">Duración</label>
