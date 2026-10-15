@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { OPCIONES_GENERO, OPCIONES_REGION } from '../constants'
+import { EDAD_MAXIMA, OPCIONES_GENERO, OPCIONES_REGION } from '../constants'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
 import { buscarUsuarioPorCorreo } from '../services/storage'
@@ -64,6 +64,11 @@ export default function PerfilPage() {
 
     if (calcularEdadLocal(fechaNacimiento) < 14) {
       setError('El perfil es solo para personas mayores a 14 años')
+      return
+    }
+
+    if (calcularEdadLocal(fechaNacimiento) > EDAD_MAXIMA) {
+      setError(`La edad máxima permitida es de ${EDAD_MAXIMA} años`)
       return
     }
 

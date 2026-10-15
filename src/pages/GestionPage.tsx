@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { EDAD_MAXIMA, OPCIONES_GENERO, STOCK_MAXIMO } from '../constants'
 import { useToast } from '../contexts/ToastContext'
 import {
   agregarUsuario,
@@ -8,11 +9,11 @@ import {
   obtenerCupoDisponible,
   obtenerProductos,
 } from '../services/storage'
-import type { Servicio } from '../types'
+import type { Genero, Servicio } from '../types'
 import PasswordInput from '../ui/PasswordInput'
 import StockBadge from '../ui/StockBadge'
 import { formatPrecio } from '../utils/format'
-import { validarContrasena, esDominioDuoc } from '../utils/validators'
+import { validarContrasena, esDominioDuoc, calcularEdad } from '../utils/validators'
 
 type Pestana = 'stock' | 'clientes'
 
@@ -21,6 +22,11 @@ export default function GestionPage() {
   const [pestana, setPestana] = useState<Pestana>('stock')
   const [productos, setProductos] = useState<Servicio[]>(() => obtenerProductos())
   const [stockEditado, setStockEditado] = useState<Record<string, number>>({})
+  const [errorStock, setErrorStock] = useState<string | null>(null)
+  const hoy = new Date().toISOString().split('T')[0]
+  const fechaMinima = new Date()
+  fechaMinima.setFullYear(fechaMinima.getFullYear() - EDAD_MAXIMA)
+  const minFecha = fechaMinima.toISOString().split('T')[0]
 
   const [formCliente, setFormCliente] = useState({
     nombre: '',
@@ -28,18 +34,25 @@ export default function GestionPage() {
     correo: '',
     fechaNacimiento: '',
     contrasena: '',
+    genero: '',
     region: '',
     direccion: '',
   })
   const [errorCliente, setErrorCliente] = useState<string | null>(null)
 
   function manejarStockChange(codigo: string, valor: number) {
+    setErrorStock(null)
     setStockEditado({ ...stockEditado, [codigo]: valor })
   }
 
   function guardarStock(codigo: string) {
+    setErrorStock(null)
     const nuevoStock = stockEditado[codigo]
-    if (nuevoStock === undefined || nuevoStock < 0) return
+    if (nuevoStock === undefined) return
+    if (!Number.isInteger(nuevoStock) || nuevoStock < 0 || nuevoStock > STOCK_MAXIMO) {
+      setErrorStock(`El stock de ${codigo} debe ser un número entero entre 0 y ${STOCK_MAXIMO}`)
+      return
+    }
     actualizarProducto(codigo, { cuposIniciales: nuevoStock + cuposRetenidos(codigo) })
     setProductos(obtenerProductos())
     setStockEditado({ ...stockEditado, [codigo]: undefined as unknown as number })
@@ -55,6 +68,8 @@ export default function GestionPage() {
       !formCliente.apellido.trim() ||
       !formCliente.correo.trim() ||
       !formCliente.contrasena.trim() ||
+      !formCliente.fechaNacimiento ||
+      !formCliente.genero ||
       !formCliente.region.trim() ||
       !formCliente.direccion.trim()
     ) {
@@ -69,6 +84,18 @@ export default function GestionPage() {
       setErrorCliente('La contraseña debe contener 8 carácteres, una mayúscula, una minúscula y un número')
       return
     }
+    if (formCliente.fechaNacimiento > hoy) {
+      setErrorCliente('La fecha de nacimiento no puede ser posterior al día de hoy')
+      return
+    }
+    if (calcularEdad(formCliente.fechaNacimiento) < 14) {
+      setErrorCliente('El usuario es solo para personas mayores a 14 años')
+      return
+    }
+    if (calcularEdad(formCliente.fechaNacimiento) > EDAD_MAXIMA) {
+      setErrorCliente(`La edad máxima permitida es de ${EDAD_MAXIMA} años`)
+      return
+    }
     if (buscarUsuarioPorCorreo(formCliente.correo.trim())) {
       setErrorCliente('El correo ya se encuentra registrado')
       return
@@ -81,7 +108,7 @@ export default function GestionPage() {
       correo: formCliente.correo.trim(),
       fechaNacimiento: formCliente.fechaNacimiento,
       contrasena: formCliente.contrasena,
-      genero: '',
+      genero: formCliente.genero as Genero | '',
       region: formCliente.region,
       direccion: formCliente.direccion.trim(),
       rol: 'cliente',
@@ -94,6 +121,7 @@ export default function GestionPage() {
       correo: '',
       fechaNacimiento: '',
       contrasena: '',
+      genero: '',
       region: '',
       direccion: '',
     })
@@ -169,6 +197,8 @@ export default function GestionPage() {
                               type="number"
                               className="form-control form-control-sm"
                               min={0}
+                              max={STOCK_MAXIMO}
+                              step={1}
                               value={
                                 stockEditado[p.codigo] ??
                                 Math.max(0, obtenerCupoDisponible(p.codigo))
@@ -190,6 +220,9 @@ export default function GestionPage() {
                     </tbody>
                   </table>
                 </div>
+                {errorStock && (
+                  <div className="alert alert-danger mt-3 mb-0">{errorStock}</div>
+                )}
               </div>
             </div>
           )}
@@ -204,8 +237,7 @@ export default function GestionPage() {
                 </h5>
               </div>
               <div className="card-body px-4 pb-4">
-                {errorCliente && <div className="alert alert-danger">{errorCliente}</div>}
-                <form onSubmit={manejarCrearCliente}>
+                <form onSubmit={manejarCrearCliente} noValidate>
                   <div className="row g-3">
                     <div className="col-md-6">
                       <label className="form-label">Nombre *</label>
@@ -244,11 +276,12 @@ export default function GestionPage() {
                       />
                     </div>
                     <div className="col-md-6">
-                      <label className="form-label">Fecha de nacimiento</label>
+                      <label className="form-label">Fecha de nacimiento *</label>
                       <input
                         type="date"
                         className="form-control"
-                        max={new Date().toISOString().split('T')[0]}
+                        max={hoy}
+                        min={minFecha}
                         value={formCliente.fechaNacimiento}
                         onChange={(e) =>
                           setFormCliente({ ...formCliente, fechaNacimiento: e.target.value })
@@ -281,7 +314,22 @@ export default function GestionPage() {
                         <option value="Magallanes">Magallanes</option>
                       </select>
                     </div>
-                    <div className="col-12">
+                    <div className="col-md-6">
+                      <label className="form-label">Género *</label>
+                      <select
+                        className="form-select"
+                        value={formCliente.genero}
+                        onChange={(e) => setFormCliente({ ...formCliente, genero: e.target.value })}
+                      >
+                        <option value="">Selecciona</option>
+                        {OPCIONES_GENERO.map((g) => (
+                          <option key={g.valor} value={g.valor}>
+                            {g.etiqueta}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-md-6">
                       <label className="form-label">Dirección *</label>
                       <input
                         type="text"
@@ -296,6 +344,7 @@ export default function GestionPage() {
                       </span>
                     </div>
                   </div>
+                  {errorCliente && <div className="alert alert-danger mt-3 mb-0">{errorCliente}</div>}
                   <div className="mt-4">
                     <button type="submit" className="btn btn-success rounded-pill px-4">
                       <i className="bi bi-person-plus me-1" />

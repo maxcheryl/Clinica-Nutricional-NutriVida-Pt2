@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { OPCIONES_GENERO, OPCIONES_REGION } from '../constants'
+import { EDAD_MAXIMA, OPCIONES_GENERO, OPCIONES_REGION } from '../constants'
 import { useAuth } from '../contexts/AuthContext'
 import { buscarUsuarioPorCorreo } from '../services/storage'
 import type { Genero } from '../types'
@@ -74,6 +74,10 @@ export default function RegistroPage() {
     const edad = calcularEdad(fechaNacimiento)
     if (edad < 14) {
       mostrarError('El registro es solo para personas mayores a 14 años')
+      return
+    }
+    if (edad > EDAD_MAXIMA) {
+      mostrarError(`La edad máxima permitida es de ${EDAD_MAXIMA} años`)
       return
     }
 

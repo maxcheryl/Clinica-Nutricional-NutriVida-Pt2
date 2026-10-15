@@ -12,6 +12,10 @@ export const PRECIO_MIN = 10000
 export const PRECIO_MAX = 170000
 export const PRECIO_STEP = 5000
 export const UMBRAL_POCOS_CUPOS = 2
+export const EDAD_MAXIMA = 120
+export const PRECIO_MINIMO = 1000
+export const PRECIO_MAXIMO = 10000000
+export const STOCK_MAXIMO = 1000
 
 export const DOMINIO_CORREO = '@duocuc.cl'
 

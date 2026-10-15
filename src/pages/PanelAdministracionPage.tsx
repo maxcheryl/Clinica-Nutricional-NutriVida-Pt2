@@ -1,5 +1,12 @@
 import { useState, type FormEvent } from 'react'
-import { OPCIONES_ROL } from '../constants'
+import {
+  EDAD_MAXIMA,
+  OPCIONES_GENERO,
+  OPCIONES_ROL,
+  PRECIO_MAXIMO,
+  PRECIO_MINIMO,
+  STOCK_MAXIMO,
+} from '../constants'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
 import {
@@ -19,12 +26,12 @@ import {
   obtenerProductos,
   obtenerUsuarios,
 } from '../services/storage'
-import type { Categoria, RolUsuario, Servicio, Usuario } from '../types'
+import type { Categoria, Genero, RolUsuario, Servicio, Usuario } from '../types'
 import AppModal from '../ui/AppModal'
 import PasswordInput from '../ui/PasswordInput'
 import StockBadge from '../ui/StockBadge'
 import { formatPrecio } from '../utils/format'
-import { validarContrasena, esDominioDuoc } from '../utils/validators'
+import { validarContrasena, esDominioDuoc, calcularEdad } from '../utils/validators'
 
 type Pestana = 'usuarios' | 'productos' | 'categorias'
 
@@ -54,6 +61,10 @@ export default function PanelAdministracionPage() {
   const { showToast } = useToast()
   const { usuario } = useAuth()
   const [pestana, setPestana] = useState<Pestana>('usuarios')
+  const hoy = new Date().toISOString().split('T')[0]
+  const fechaMinima = new Date()
+  fechaMinima.setFullYear(fechaMinima.getFullYear() - EDAD_MAXIMA)
+  const minFecha = fechaMinima.toISOString().split('T')[0]
 
   const [usuarios, setUsuarios] = useState<Usuario[]>(() => obtenerUsuarios())
   const [productos, setProductos] = useState<Servicio[]>(() => obtenerProductos())
@@ -118,6 +129,8 @@ export default function PanelAdministracionPage() {
       !formUsuario.apellido.trim() ||
       !formUsuario.correo.trim() ||
       !formUsuario.contrasena.trim() ||
+      !formUsuario.fechaNacimiento ||
+      !formUsuario.genero ||
       !formUsuario.region.trim() ||
       !formUsuario.direccion.trim()
     ) {
@@ -130,6 +143,18 @@ export default function PanelAdministracionPage() {
     }
     if (!validarContrasena(formUsuario.contrasena)) {
       setErrorForm('La contraseña debe contener 8 carácteres, una mayúscula, una minúscula y un número')
+      return
+    }
+    if (formUsuario.fechaNacimiento > hoy) {
+      setErrorForm('La fecha de nacimiento no puede ser posterior al día de hoy')
+      return
+    }
+    if (calcularEdad(formUsuario.fechaNacimiento) < 14) {
+      setErrorForm('El usuario es solo para personas mayores a 14 años')
+      return
+    }
+    if (calcularEdad(formUsuario.fechaNacimiento) > EDAD_MAXIMA) {
+      setErrorForm(`La edad máxima permitida es de ${EDAD_MAXIMA} años`)
       return
     }
     if (!usuarioEditando && buscarUsuarioPorCorreo(formUsuario.correo.trim())) {
@@ -205,13 +230,28 @@ export default function PanelAdministracionPage() {
     e.preventDefault()
     setErrorForm(null)
 
+    if (!formProducto.nombre.trim() || !formProducto.tipo) {
+      setErrorForm('Completa los campos obligatorios (nombre y categoría)')
+      return
+    }
+
     if (
-      !formProducto.nombre.trim() ||
-      !formProducto.tipo ||
-      formProducto.precio <= 0 ||
-      formProducto.cuposIniciales < 0
+      !Number.isInteger(formProducto.precio) ||
+      formProducto.precio < PRECIO_MINIMO ||
+      formProducto.precio > PRECIO_MAXIMO
     ) {
-      setErrorForm('Completa los campos obligatorios (nombre, categoría, precio, stock)')
+      setErrorForm(
+        `El precio debe ser un número entero entre ${formatPrecio(PRECIO_MINIMO)} y ${formatPrecio(PRECIO_MAXIMO)}`,
+      )
+      return
+    }
+
+    if (
+      !Number.isInteger(formProducto.cuposIniciales) ||
+      formProducto.cuposIniciales < 0 ||
+      formProducto.cuposIniciales > STOCK_MAXIMO
+    ) {
+      setErrorForm(`El stock debe ser un número entero entre 0 y ${STOCK_MAXIMO}`)
       return
     }
 
@@ -529,8 +569,7 @@ export default function PanelAdministracionPage() {
               />
             </div>
             <div className="modal-body">
-              {errorForm && <div className="alert alert-danger">{errorForm}</div>}
-              <form onSubmit={guardarUsuario}>
+              <form onSubmit={guardarUsuario} noValidate>
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label className="form-label">Nombre *</label>
@@ -567,12 +606,13 @@ export default function PanelAdministracionPage() {
                     />
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label">Fecha de nacimiento</label>
+                    <label className="form-label">Fecha de nacimiento *</label>
                     <input
                       type="date"
                       className="form-control"
                       value={formUsuario.fechaNacimiento}
-                      max={new Date().toISOString().split('T')[0]}
+                      max={hoy}
+                      min={minFecha}
                       onChange={(e) =>
                         setFormUsuario({ ...formUsuario, fechaNacimiento: e.target.value })
                       }
@@ -624,6 +664,26 @@ export default function PanelAdministracionPage() {
                       <option value="Magallanes">Magallanes</option>
                     </select>
                   </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Género *</label>
+                    <select
+                      className="form-select"
+                      value={formUsuario.genero}
+                      onChange={(e) =>
+                        setFormUsuario({
+                          ...formUsuario,
+                          genero: e.target.value as Genero | '',
+                        })
+                      }
+                    >
+                      <option value="">Selecciona</option>
+                      {OPCIONES_GENERO.map((g) => (
+                        <option key={g.valor} value={g.valor}>
+                          {g.etiqueta}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <div className="col-12">
                     <label className="form-label">Dirección *</label>
                     <input
@@ -634,6 +694,7 @@ export default function PanelAdministracionPage() {
                     />
                   </div>
                 </div>
+                {errorForm && <div className="alert alert-danger mt-3 mb-0">{errorForm}</div>}
                 <div className="modal-footer border-0 pt-3 px-0">
                   <button
                     type="button"
@@ -668,8 +729,7 @@ export default function PanelAdministracionPage() {
               />
             </div>
             <div className="modal-body">
-              {errorForm && <div className="alert alert-danger">{errorForm}</div>}
-              <form onSubmit={guardarProducto}>
+              <form onSubmit={guardarProducto} noValidate>
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label className="form-label">Nombre *</label>
@@ -700,7 +760,8 @@ export default function PanelAdministracionPage() {
                     <input
                       type="number"
                       className="form-control"
-                      min={0}
+                      min={PRECIO_MINIMO}
+                      max={PRECIO_MAXIMO}
                       value={formProducto.precio}
                       onChange={(e) =>
                         setFormProducto({ ...formProducto, precio: Number(e.target.value) })
@@ -713,6 +774,8 @@ export default function PanelAdministracionPage() {
                       type="number"
                       className="form-control"
                       min={0}
+                      max={STOCK_MAXIMO}
+                      step={1}
                       value={formProducto.cuposIniciales}
                       onChange={(e) =>
                         setFormProducto({ ...formProducto, cuposIniciales: Number(e.target.value) })
@@ -756,6 +819,7 @@ export default function PanelAdministracionPage() {
                     />
                   </div>
                 </div>
+                {errorForm && <div className="alert alert-danger mt-3 mb-0">{errorForm}</div>}
                 <div className="modal-footer border-0 pt-3 px-0">
                   <button
                     type="button"
