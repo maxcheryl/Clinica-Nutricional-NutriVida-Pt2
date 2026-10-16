@@ -15,6 +15,7 @@ export const EDAD_MAXIMA = 120
 export const PRECIO_MINIMO = 1000
 export const PRECIO_MAXIMO = 10000000
 export const STOCK_MAXIMO = 1000
+export const IMAGEN_DEFECTO = '/assets/img/servicioDefault.jpg'
 
 export const DOMINIO_CORREO = '@duocuc.cl'
 

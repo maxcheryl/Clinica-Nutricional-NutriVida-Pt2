@@ -9,6 +9,7 @@ export interface Servicio {
   precio: number
   cuposIniciales: number
   descripcion: string
+  imagen?: string
 }
 
 export interface Categoria {

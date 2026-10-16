@@ -10,6 +10,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial',
     precio: 35000,
     cuposIniciales: 5,
+    imagen: '/assets/img/consulta.png',
     descripcion:
       'Evaluación inicial: anamnesis, antropometría completa y diseño del primer plan alimenticio.',
   },
@@ -21,6 +22,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial',
     precio: 25000,
     cuposIniciales: 5,
+    imagen: '/assets/img/consulta.png',
     descripcion: 'Seguimiento mensual: medición de indicadores y ajuste del plan vigente.',
   },
   {
@@ -31,6 +33,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial',
     precio: 22000,
     cuposIniciales: 5,
+    imagen: '/assets/img/consulta.png',
     descripcion: 'Seguimiento intensivo cada 15 días. Recomendado en los primeros 2 meses.',
   },
   {
@@ -41,6 +44,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Online (video)',
     precio: 20000,
     cuposIniciales: 5,
+    imagen: '/assets/img/consulta.png',
     descripcion:
       'Consulta de seguimiento vía videollamada. Requiere contar con consulta presencial previa.',
   },
@@ -52,6 +56,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial',
     precio: 28000,
     cuposIniciales: 5,
+    imagen: '/assets/img/consulta.png',
     descripcion: 'Para pacientes que requieren atención fuera de su control habitual.',
   },
   // PLANES ESPECIALIZADOS
@@ -63,6 +68,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial',
     precio: 65000,
     cuposIniciales: 3,
+    imagen: '/assets/img/plan.png',
     descripcion:
       'Incluye primera consulta + 1 control quincenal + plan alimenticio personalizado + seguimiento por WhatsApp.',
   },
@@ -74,6 +80,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial',
     precio: 170000,
     cuposIniciales: 3,
+    imagen: '/assets/img/plan.png',
     descripcion:
       'Incluye primera consulta + 5 controles + 3 planes mensuales + seguimiento continuo.',
   },
@@ -85,6 +92,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial',
     precio: 70000,
     cuposIniciales: 3,
+    imagen: '/assets/img/plan.png',
     descripcion:
       'Para deportistas y personas con actividad física frecuente. Cálculo de requerimientos energéticos y proteicos.',
   },
@@ -96,6 +104,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial',
     precio: 75000,
     cuposIniciales: 3,
+    imagen: '/assets/img/plan.png',
     descripcion:
       'Plan adaptado para patologías metabólicas. Coordinación con médico tratante si aplica.',
   },
@@ -107,6 +116,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial',
     precio: 68000,
     cuposIniciales: 3,
+    imagen: '/assets/img/plan.png',
     descripcion:
       'Diseñado para garantizar aporte adecuado de proteínas, hierro, vitamina B12 y calcio sin productos animales.',
   },
@@ -118,6 +128,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial',
     precio: 65000,
     cuposIniciales: 3,
+    imagen: '/assets/img/plan.png',
     descripcion:
       'Evaluación nutricional pediátrica y diseño de plan adaptado a la etapa de desarrollo del niño.',
   },
@@ -130,6 +141,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial',
     precio: 18000,
     cuposIniciales: 8,
+    imagen: '/assets/img/evaluacion.png',
     descripcion:
       'Peso, talla, IMC, circunferencia de cintura, cadera, brazo y % de grasa corporal con bioimpedanciometría.',
   },
@@ -141,6 +153,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial',
     precio: 12000,
     cuposIniciales: 8,
+    imagen: '/assets/img/evaluacion.png',
     descripcion:
       'Medición de composición corporal: masa grasa, masa muscular, agua corporal y edad metabólica.',
   },
@@ -152,6 +165,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial',
     precio: 10000,
     cuposIniciales: 8,
+    imagen: '/assets/img/evaluacion.png',
     descripcion:
       'Análisis del patrón alimentario actual. Identificación de déficit y excesos nutricionales.',
   },
@@ -163,6 +177,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial',
     precio: 15000,
     cuposIniciales: 8,
+    imagen: '/assets/img/evaluacion.png',
     descripcion:
       'Interpretación de hemograma, perfil bioquímico y lipídico en contexto nutricional.',
   },
@@ -175,6 +190,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial (grupo)',
     precio: 15000,
     cuposIniciales: 10,
+    imagen: '/assets/img/taller.png',
     descripcion:
       'Máx. 10 personas. Conceptos básicos de alimentación equilibrada y lectura de etiquetas.',
   },
@@ -186,6 +202,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial (grupo)',
     precio: 20000,
     cuposIniciales: 8,
+    imagen: '/assets/img/taller.png',
     descripcion: 'Preparación de recetas saludables. Incluye degustación. Máx. 8 personas.',
   },
   {
@@ -196,6 +213,7 @@ export const servicios: Servicio[] = [
     modalidad: 'Presencial (grupo)',
     precio: 18000,
     cuposIniciales: 12,
+    imagen: '/assets/img/taller.png',
     descripcion:
       'Hidratación, nutrición pre y post entrenamiento, suplementación básica. Máx. 12 personas.',
   },

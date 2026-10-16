@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import {
   EDAD_MAXIMA,
+  IMAGEN_DEFECTO,
   OPCIONES_GENERO,
   OPCIONES_ROL,
   PRECIO_MAXIMO,
@@ -275,7 +276,7 @@ export default function PanelAdministracionPage() {
       while (buscarProductoPorCodigo(codigo)) {
         codigo = `${prefijo}${Date.now().toString().slice(-4)}`
       }
-      agregarProducto({ codigo, ...formProducto })
+      agregarProducto({ codigo, ...formProducto, imagen: IMAGEN_DEFECTO })
       showToast('Producto creado correctamente', 'success')
     }
     setModalProductoAbierto(false)

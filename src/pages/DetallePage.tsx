@@ -1,18 +1,12 @@
 import { useEffect, useMemo } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getBadgeClass, getTipoIcon } from '../data/servicios'
+import { IMAGEN_DEFECTO } from '../constants'
 import { useCart } from '../contexts/CartContext'
 import { useToast } from '../contexts/ToastContext'
 import Breadcrumb from '../layout/Breadcrumb'
 import { buscarProductoPorCodigo } from '../services/storage'
 import { formatPrecio } from '../utils/format'
-
-const IMAGENES_TIPO: Record<string, string> = {
-  Consulta: '/assets/img/consulta.png',
-  'Plan especializado': '/assets/img/plan.png',
-  Evaluación: '/assets/img/evaluacion.png',
-  'Taller grupal': '/assets/img/taller.png',
-}
 
 const QUE_INCLUYE_POR_TIPO: Record<string, string[]> = {
   Consulta: [
@@ -134,7 +128,7 @@ export default function DetallePage() {
     )
   }
 
-  const imagenTipo = IMAGENES_TIPO[servicio.tipo] || null
+  const imagen = servicio.imagen || IMAGEN_DEFECTO
   const listaIncluye = QUE_INCLUYE_POR_TIPO[servicio.tipo] || LISTA_FALLBACK
 
   return (
@@ -182,16 +176,14 @@ export default function DetallePage() {
                 </h1>
                 <p className="lead text-muted mb-4 fs-6">{servicio.descripcion}</p>
 
-                {imagenTipo && (
-                  <div className="detalle-img-frame mb-4 text-center p-3 shadow-sm">
-                    <img
-                      src={imagenTipo}
-                      alt={servicio.tipo}
-                      className="img-fluid rounded-3"
-                      style={{ maxHeight: '280px', width: 'auto', objectFit: 'contain' }}
-                    />
-                  </div>
-                )}
+                <div className="detalle-img-frame mb-4 text-center p-3 shadow-sm">
+                  <img
+                    src={imagen}
+                    alt={servicio.nombre}
+                    className="img-fluid rounded-3"
+                    style={{ maxHeight: '280px', width: 'auto', objectFit: 'contain' }}
+                  />
+                </div>
 
                 <div className="card card-detalle border-0 shadow-sm rounded-4 p-4 mb-4">
                   <div className="d-flex align-items-center gap-2 mb-3">
