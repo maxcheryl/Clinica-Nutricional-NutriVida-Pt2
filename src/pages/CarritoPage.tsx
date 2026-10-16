@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getBadgeClass, getTipoIcon } from '../data/servicios'
+import { UMBRAL_POCOS_CUPOS } from '../constants'
 import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
 import { useToast } from '../contexts/ToastContext'
@@ -20,7 +21,10 @@ export default function CarritoPage() {
   const [modalLoginAbierto, setModalLoginAbierto] = useState(false)
   const [modalExitoAbierto, setModalExitoAbierto] = useState(false)
 
-  const total = carrito.reduce((sum, s) => sum + s.precio * s.cantidad, 0)
+  const total = carrito.reduce((sum, s) => {
+    const precio = buscarProductoPorCodigo(s.codigo)?.precio ?? s.precio
+    return sum + precio * s.cantidad
+  }, 0)
 
   function agregarDesdeCarrito(codigo: string) {
     const disponibles = cupoDisponible(codigo)
@@ -43,6 +47,14 @@ export default function CarritoPage() {
   function manejarConfirmarReserva() {
     if (!usuario) {
       setModalLoginAbierto(true)
+      return
+    }
+    const excedido = carrito.find((item) => cupoDisponible(item.codigo) < 0)
+    if (excedido) {
+      showToast(
+        `No hay cupos suficientes para "${excedido.nombre}". Ajusta tu reserva para continuar`,
+        'danger',
+      )
       return
     }
     confirmarReserva()
@@ -139,6 +151,7 @@ export default function CarritoPage() {
                           <tbody>
                             {carrito.map((servicio) => {
                               const cupos = cupoDisponible(servicio.codigo)
+                              const datos = buscarProductoPorCodigo(servicio.codigo) ?? servicio
                               return (
                                 <tr className="border-bottom" key={servicio.codigo}>
                                   <td className="ps-4 py-3">
@@ -147,26 +160,26 @@ export default function CarritoPage() {
                                         className="bg-light rounded-3 text-success d-flex align-items-center justify-content-center"
                                         style={{ width: '44px', height: '44px', flexShrink: 0 }}
                                       >
-                                        <i className={`bi ${getTipoIcon(servicio.tipo)} fs-5`} />
+                                          <i className={`bi ${getTipoIcon(datos.tipo)} fs-5`} />
                                       </div>
                                       <div>
                                         <Link
                                           to={`/servicios/${servicio.codigo}`}
                                           className="text-decoration-none text-dark fw-bold d-block mb-1"
                                         >
-                                          {servicio.nombre}
+                                          {datos.nombre}
                                         </Link>
                                         <div className="d-flex flex-wrap gap-2 align-items-center">
-                                          <span className={`badge ${getBadgeClass(servicio.tipo)} rounded-pill`}>
-                                            {servicio.tipo}
+                                          <span className={`badge ${getBadgeClass(datos.tipo)} rounded-pill`}>
+                                            {datos.tipo}
                                           </span>
                                           <span className="text-muted small">
                                             <i className="bi bi-clock me-1" />
-                                            {servicio.duracion}
+                                            {datos.duracion}
                                           </span>
                                           <span className="text-muted small">•</span>
                                           <span className="text-muted small">
-                                            {formatPrecio(servicio.precio)} c/u
+                                            {formatPrecio(datos.precio)} c/u
                                           </span>
                                         </div>
                                       </div>
@@ -208,7 +221,7 @@ export default function CarritoPage() {
                                         </button>
                                       )}
                                     </div>
-                                    {cupos <= 2 && cupos > 0 && (
+                                    {cupos <= UMBRAL_POCOS_CUPOS && cupos > 0 && (
                                       <div
                                         className="text-warning small mt-1"
                                         style={{ fontSize: '0.72rem' }}
@@ -219,7 +232,7 @@ export default function CarritoPage() {
                                   </td>
                                   <td className="py-3 text-end">
                                     <span className="fw-bold text-dark fs-6">
-                                      {formatPrecio(servicio.precio * servicio.cantidad)}
+                                      {formatPrecio(datos.precio * servicio.cantidad)}
                                     </span>
                                   </td>
                                   <td className="pe-4 py-3 text-end">
@@ -244,6 +257,7 @@ export default function CarritoPage() {
                     <div className="card-body p-3 carrito-mobile-card d-md-none">
                       {carrito.map((servicio) => {
                         const cupos = cupoDisponible(servicio.codigo)
+                        const datos = buscarProductoPorCodigo(servicio.codigo) ?? servicio
                         return (
                           <div className="border rounded-3 p-3 mb-3" key={servicio.codigo}>
                             <div className="d-flex justify-content-between align-items-start mb-2">
@@ -252,15 +266,15 @@ export default function CarritoPage() {
                                   to={`/servicios/${servicio.codigo}`}
                                   className="text-decoration-none text-dark fw-bold d-block mb-1"
                                 >
-                                  {servicio.nombre}
+                                  {datos.nombre}
                                 </Link>
                                 <div className="d-flex flex-wrap gap-2 align-items-center mb-2">
-                                  <span className={`badge ${getBadgeClass(servicio.tipo)} rounded-pill`}>
-                                    {servicio.tipo}
+                                  <span className={`badge ${getBadgeClass(datos.tipo)} rounded-pill`}>
+                                    {datos.tipo}
                                   </span>
                                   <span className="text-muted small">
                                     <i className="bi bi-clock me-1" />
-                                    {servicio.duracion}
+                                    {datos.duracion}
                                   </span>
                                 </div>
                               </div>
@@ -307,10 +321,10 @@ export default function CarritoPage() {
                                 )}
                               </div>
                               <span className="fw-bold text-success">
-                                {formatPrecio(servicio.precio * servicio.cantidad)}
+                                {formatPrecio(datos.precio * servicio.cantidad)}
                               </span>
                             </div>
-                            {cupos <= 2 && cupos > 0 && (
+                            {cupos <= UMBRAL_POCOS_CUPOS && cupos > 0 && (
                               <div className="text-warning small mt-2" style={{ fontSize: '0.72rem' }}>
                                 ¡Últimos {cupos} cupos!
                               </div>

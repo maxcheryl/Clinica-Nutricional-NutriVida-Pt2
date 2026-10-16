@@ -38,6 +38,11 @@ export default function HomePage() {
       return
     }
 
+    if (mensajeTrim.length < 10) {
+      setErrorContacto('El mensaje debe tener al menos 10 caracteres')
+      return
+    }
+
     if (!esDominioDuoc(emailTrim)) {
       setErrorContacto('El dominio del correo debe ser @duocuc.cl')
       return
@@ -213,7 +218,7 @@ export default function HomePage() {
                 <div className="card card-contacto h-100">
                   <div className="card-body p-4 p-lg-5">
                     <h4 className="contacto-card-title mb-4">Envíanos un mensaje</h4>
-                    <form id="contactForm" onSubmit={manejarContacto}>
+                    <form id="contactForm" onSubmit={manejarContacto} noValidate>
                       <div className="mb-3">
                         <label htmlFor="nombre" className="form-label">
                           Nombre completo<span className="obligatorio">*</span>

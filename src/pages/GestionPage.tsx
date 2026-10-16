@@ -203,7 +203,12 @@ export default function GestionPage() {
                                 stockEditado[p.codigo] ??
                                 Math.max(0, obtenerCupoDisponible(p.codigo))
                               }
-                              onChange={(e) => manejarStockChange(p.codigo, Number(e.target.value))}
+                              onChange={(e) =>
+                                manejarStockChange(
+                                  p.codigo,
+                                  e.target.value.trim() === '' ? Number.NaN : Number(e.target.value),
+                                )
+                              }
                             />
                           </td>
                           <td className="text-end">

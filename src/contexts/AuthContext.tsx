@@ -1,11 +1,13 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Sesion, Usuario } from '../types'
+import { DOMINIO_CORREO } from '../constants'
 import {
   agregarUsuario,
   actualizarUsuario,
   borrarSesion,
   buscarUsuarioPorCorreo,
+  buscarUsuarioPorId,
   estaBloqueado,
   guardarSesion,
   incrementarIntentos,
@@ -27,6 +29,7 @@ interface AuthContextValue {
   cerrarSesion: () => void
   registrarUsuario: (usuario: Usuario) => void
   actualizarPerfil: (datos: Partial<Usuario>) => void
+  refrescarSesion: () => void
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -40,6 +43,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     sembrarAdminSiFalta()
   }, [])
 
+  function aSesion(u: Usuario): Sesion {
+    return {
+      id: u.id,
+      nombre: u.nombre,
+      apellido: u.apellido,
+      correo: u.correo,
+      genero: u.genero,
+      region: u.region,
+      rol: u.rol,
+    }
+  }
+
   function iniciarSesion(correoInput: string, contrasena: string): ResultadoLogin {
     const correo = correoInput.trim().toLowerCase()
 
@@ -47,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { exito: false, mensaje: 'Debes completar todos los campos' }
     }
 
-    if (!correo.endsWith('@duocuc.cl')) {
+    if (!correo.endsWith(DOMINIO_CORREO)) {
       return { exito: false, mensaje: 'El correo debe ser del dominio @duocuc.cl' }
     }
 
@@ -78,15 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     resetearIntentos(correo)
 
-    const usuarioSesion: Sesion = {
-      id: usuarioEncontrado.id,
-      nombre: usuarioEncontrado.nombre,
-      apellido: usuarioEncontrado.apellido,
-      correo: usuarioEncontrado.correo,
-      genero: usuarioEncontrado.genero,
-      region: usuarioEncontrado.region,
-      rol: usuarioEncontrado.rol,
-    }
+    const usuarioSesion: Sesion = aSesion(usuarioEncontrado)
 
     guardarSesion(usuarioSesion)
     setUsuario(usuarioSesion)
@@ -106,25 +113,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   function actualizarPerfil(datos: Partial<Usuario>) {
     if (!usuario) return
     actualizarUsuario(usuario.correo, datos)
-    const usuarioActualizado = buscarUsuarioPorCorreo(datos.correo ?? usuario.correo)
+    const usuarioActualizado = buscarUsuarioPorId(usuario.id)
     if (usuarioActualizado) {
-      const nuevaSesion: Sesion = {
-        id: usuarioActualizado.id,
-        nombre: usuarioActualizado.nombre,
-        apellido: usuarioActualizado.apellido,
-        correo: usuarioActualizado.correo,
-        genero: usuarioActualizado.genero,
-        region: usuarioActualizado.region,
-        rol: usuarioActualizado.rol,
-      }
+      const nuevaSesion: Sesion = aSesion(usuarioActualizado)
       guardarSesion(nuevaSesion)
       setUsuario(nuevaSesion)
     }
   }
 
+  function refrescarSesion() {
+    if (!usuario) return
+    const usuarioActualizado = buscarUsuarioPorId(usuario.id)
+    if (!usuarioActualizado) return
+    const nuevaSesion: Sesion = aSesion(usuarioActualizado)
+    guardarSesion(nuevaSesion)
+    setUsuario(nuevaSesion)
+  }
+
   return (
     <AuthContext.Provider
-      value={{ usuario, iniciarSesion, cerrarSesion, registrarUsuario, actualizarPerfil }}
+      value={{ usuario, iniciarSesion, cerrarSesion, registrarUsuario, actualizarPerfil, refrescarSesion }}
     >
       {children}
     </AuthContext.Provider>

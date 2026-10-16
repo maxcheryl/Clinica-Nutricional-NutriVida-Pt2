@@ -21,6 +21,7 @@ interface CartContextValue {
   eliminarDelCarrito: (codigo: string) => void
   vaciarCarrito: () => void
   confirmarReserva: () => void
+  sincronizar: () => void
 }
 
 const CartContext = createContext<CartContextValue | null>(null)
@@ -71,6 +72,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCarrito([])
   }
 
+  function sincronizar() {
+    setCarrito(obtenerCarrito())
+    setReservados(obtenerReservados())
+  }
+
   return (
     <CartContext.Provider
       value={{
@@ -83,6 +89,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         eliminarDelCarrito,
         vaciarCarrito,
         confirmarReserva,
+        sincronizar,
       }}
     >
       {children}

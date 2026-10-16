@@ -201,10 +201,6 @@ export const servicios: Servicio[] = [
   },
 ]
 
-export function getServicioPorCodigo(codigo: string): Servicio | undefined {
-  return servicios.find((s) => s.codigo === codigo)
-}
-
 export function getBadgeClass(tipo: string): string {
   const classes: Record<string, string> = {
     Consulta: 'bg-success text-white',

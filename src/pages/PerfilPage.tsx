@@ -57,8 +57,16 @@ export default function PerfilPage() {
       return
     }
 
+    if (
+      buscarUsuarioPorCorreo(correo.trim()) &&
+      correo.trim().toLowerCase() !== usuario?.correo.toLowerCase()
+    ) {
+      setError('El correo ya se encuentra registrado')
+      return
+    }
+
     if (fechaNacimiento > hoy) {
-      setError('La fecha de nacimiento no puede ser futura')
+      setError('La fecha de nacimiento no puede ser posterior al día de hoy')
       return
     }
 
@@ -149,7 +157,7 @@ export default function PerfilPage() {
                   <div className="alert alert-danger mt-3">{error}</div>
                 )}
 
-                <form onSubmit={manejarSubmit}>
+                <form onSubmit={manejarSubmit} noValidate>
                   <div className="row g-3">
                     <div className="col-md-6">
                       <label htmlFor="perfil-nombre" className="form-label">

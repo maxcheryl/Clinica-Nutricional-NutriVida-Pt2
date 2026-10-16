@@ -8,6 +8,7 @@ import {
   STOCK_MAXIMO,
 } from '../constants'
 import { useAuth } from '../contexts/AuthContext'
+import { useCart } from '../contexts/CartContext'
 import { useToast } from '../contexts/ToastContext'
 import {
   agregarCategoria,
@@ -16,6 +17,7 @@ import {
   actualizarCategoria,
   actualizarProducto,
   actualizarUsuario,
+  buscarProductoPorCodigo,
   buscarUsuarioPorCorreo,
   cuposRetenidos,
   eliminarCategoria,
@@ -59,7 +61,8 @@ const PRODUCTO_VACIO: Omit<Servicio, 'codigo'> = {
 
 export default function PanelAdministracionPage() {
   const { showToast } = useToast()
-  const { usuario } = useAuth()
+  const { usuario, refrescarSesion } = useAuth()
+  const { sincronizar } = useCart()
   const [pestana, setPestana] = useState<Pestana>('usuarios')
   const hoy = new Date().toISOString().split('T')[0]
   const fechaMinima = new Date()
@@ -157,7 +160,11 @@ export default function PanelAdministracionPage() {
       setErrorForm(`La edad máxima permitida es de ${EDAD_MAXIMA} años`)
       return
     }
-    if (!usuarioEditando && buscarUsuarioPorCorreo(formUsuario.correo.trim())) {
+    if (
+      (!usuarioEditando ||
+        formUsuario.correo.trim().toLowerCase() !== usuarioEditando.correo.toLowerCase()) &&
+      buscarUsuarioPorCorreo(formUsuario.correo.trim())
+    ) {
       setErrorForm('El correo ya se encuentra registrado')
       return
     }
@@ -170,6 +177,7 @@ export default function PanelAdministracionPage() {
         rol: editandoCuentaPropia && usuario ? usuario.rol : formUsuario.rol,
         correo: formUsuario.correo.trim(),
       })
+      if (editandoCuentaPropia) refrescarSesion()
       showToast('Usuario actualizado correctamente', 'success')
     } else {
       agregarUsuario({
@@ -263,7 +271,10 @@ export default function PanelAdministracionPage() {
       showToast('Producto actualizado correctamente', 'success')
     } else {
       const prefijo = formProducto.tipo.charAt(0).toUpperCase() + formProducto.tipo.charAt(1)
-      const codigo = `${prefijo}${Date.now().toString().slice(-4)}`
+      let codigo = `${prefijo}${Date.now().toString().slice(-4)}`
+      while (buscarProductoPorCodigo(codigo)) {
+        codigo = `${prefijo}${Date.now().toString().slice(-4)}`
+      }
       agregarProducto({ codigo, ...formProducto })
       showToast('Producto creado correctamente', 'success')
     }
@@ -274,6 +285,7 @@ export default function PanelAdministracionPage() {
   function manejarEliminarProducto(codigo: string) {
     pedirConfirmacion(`¿Eliminar el producto ${codigo}?`, () => {
       eliminarProducto(codigo)
+      sincronizar()
       showToast('Producto eliminado', 'warning')
       refrescar()
     })

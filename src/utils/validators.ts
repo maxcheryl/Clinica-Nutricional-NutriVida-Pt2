@@ -1,3 +1,5 @@
+import { DOMINIO_CORREO } from '../constants'
+
 export function validarContrasena(contrasena: string): boolean {
   return (
     /.{8,}/.test(contrasena) &&
@@ -8,7 +10,7 @@ export function validarContrasena(contrasena: string): boolean {
 }
 
 export function esDominioDuoc(correo: string): boolean {
-  return correo.trim().toLowerCase().endsWith('@duocuc.cl')
+  return correo.trim().toLowerCase().endsWith(DOMINIO_CORREO)
 }
 
 export function calcularEdad(fechaNacimiento: string): number {

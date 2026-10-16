@@ -36,6 +36,10 @@ export function buscarUsuarioPorCorreo(correo: string): Usuario | undefined {
   return usuarios.find((usuario) => usuario.correo.toLowerCase() === correo.toLowerCase())
 }
 
+export function buscarUsuarioPorId(id: string): Usuario | undefined {
+  return obtenerUsuarios().find((usuario) => usuario.id === id)
+}
+
 export function actualizarUsuario(correo: string, datos: Partial<Usuario>): void {
   const usuarios = obtenerUsuarios()
   const indice = usuarios.findIndex((u) => u.correo === correo)
@@ -160,8 +164,13 @@ export function actualizarProducto(codigo: string, datos: Partial<Servicio>): vo
 }
 
 export function eliminarProducto(codigo: string): void {
-  const productos = obtenerProductos().filter((p) => p.codigo !== codigo)
-  guardarProductos(productos)
+  guardarProductos(obtenerProductos().filter((p) => p.codigo !== codigo))
+  guardarCarrito(obtenerCarrito().filter((i) => i.codigo !== codigo))
+  const reservados = obtenerReservados()
+  if (codigo in reservados) {
+    delete reservados[codigo]
+    guardarReservados(reservados)
+  }
 }
 
 export function buscarProductoPorCodigo(codigo: string): Servicio | undefined {
@@ -199,8 +208,17 @@ export function actualizarCategoria(id: string, nombre: string): void {
   const categorias = obtenerCategorias()
   const indice = categorias.findIndex((c) => c.id === id)
   if (indice === -1) return
+  const nombreAnterior = categorias[indice].nombre
   categorias[indice] = { ...categorias[indice], nombre }
   guardarCategorias(categorias)
+  if (nombreAnterior !== nombre) {
+    const productos = obtenerProductos()
+    if (productos.some((p) => p.tipo === nombreAnterior)) {
+      guardarProductos(
+        productos.map((p) => (p.tipo === nombreAnterior ? { ...p, tipo: nombre } : p)),
+      )
+    }
+  }
 }
 
 export function eliminarCategoria(id: string): boolean {
@@ -224,7 +242,7 @@ export function guardarCarrito(carrito: CarritoItem[]): void {
   localStorage.setItem(CLAVE_CARRITO, JSON.stringify(carrito))
 }
 
-export function agregarAlCarrito(servicio: Servicio): boolean {
+export function agregarAlCarrito(servicio: Servicio): void {
   const carrito = obtenerCarrito()
   const existe = carrito.find((item) => item.codigo === servicio.codigo)
   if (existe) {
@@ -233,7 +251,6 @@ export function agregarAlCarrito(servicio: Servicio): boolean {
     carrito.push({ ...servicio, cantidad: 1 })
   }
   guardarCarrito(carrito)
-  return true
 }
 
 export function reducirCantidad(codigo: string): void {
@@ -256,14 +273,6 @@ export function eliminarDelCarrito(codigo: string): void {
 
 export function vaciarCarrito(): void {
   localStorage.removeItem(CLAVE_CARRITO)
-}
-
-export function contarCarrito(): number {
-  return obtenerCarrito().reduce((sum, item) => sum + item.cantidad, 0)
-}
-
-export function serviciosEnCarrito(): number {
-  return obtenerCarrito().length
 }
 
 export function cantidadEnCarrito(codigo: string): number {

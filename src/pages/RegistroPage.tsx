@@ -71,6 +71,11 @@ export default function RegistroPage() {
       return
     }
 
+    if (fechaNacimiento > hoy) {
+      mostrarError('La fecha de nacimiento no puede ser posterior al día de hoy')
+      return
+    }
+
     const edad = calcularEdad(fechaNacimiento)
     if (edad < 14) {
       mostrarError('El registro es solo para personas mayores a 14 años')
@@ -132,7 +137,7 @@ export default function RegistroPage() {
                 <p className="auth-subtitle">Regístrate para acceder a nuestros servicios</p>
               </div>
 
-              <form id="formCrearCuenta" onSubmit={manejarSubmit}>
+              <form id="formCrearCuenta" onSubmit={manejarSubmit} noValidate>
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label htmlFor="nombre" className="form-label">
