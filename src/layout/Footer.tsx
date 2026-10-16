@@ -1,7 +1,7 @@
 /**
  * Pie de página estático: marca, enlaces de navegación y contacto.
  */
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
@@ -12,8 +12,8 @@ export default function Footer() {
             <div className="footer-brand-box">
               <h5 className="footer-title">NutriVida</h5>
               <p className="footer-text">
-                Clínica nutricional dedicada a mejorar tu calidad de vida mediante hábitos
-                alimentarios saludables y atención profesional.
+                Clínica nutricional dedicada a mejorar tu calidad de vida
+                mediante hábitos alimentarios saludables y atención profesional.
               </p>
             </div>
           </div>
@@ -64,9 +64,9 @@ export default function Footer() {
         <p className="footer-copyright">
           DSY1104 - 2026
           <br />
-          Grupo Calcetines: Sebastián Neira - Maxine Moreno
+          Maxine Moreno
         </p>
       </div>
     </footer>
-  )
+  );
 }
