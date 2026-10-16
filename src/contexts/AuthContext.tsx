@@ -1,3 +1,7 @@
+/**
+ * Contexto de autenticación: sesión actual, login/logout, registro y
+ * actualización de perfil. Toda escritura de usuarios pasa por storage.
+ */
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Sesion, Usuario } from '../types'
@@ -43,6 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     sembrarAdminSiFalta()
   }, [])
 
+  /** Proyecta un Usuario completo a los datos públicos de sesión (sin contraseña). */
   function aSesion(u: Usuario): Sesion {
     return {
       id: u.id,
@@ -110,6 +115,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     agregarUsuario(nuevo)
   }
 
+  /**
+   * Actualiza el perfil del usuario en sesión y reconstruye la sesión con el
+   * registro fresco (buscado por id: sobrevive a cambios de correo).
+   */
   function actualizarPerfil(datos: Partial<Usuario>) {
     if (!usuario) return
     actualizarUsuario(usuario.correo, datos)
@@ -121,6 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  /** Relee el registro de la sesión actual por id y la sincroniza (edición desde paneles). */
   function refrescarSesion() {
     if (!usuario) return
     const usuarioActualizado = buscarUsuarioPorId(usuario.id)

@@ -1,3 +1,8 @@
+/**
+ * Panel de administración (solo admin): CRUD de usuarios, productos y
+ * categorías, con validaciones completas, modales de confirmación y
+ * protección de la cuenta propia.
+ */
 import { useState, type FormEvent } from 'react'
 import {
   EDAD_MAXIMA,
@@ -170,6 +175,8 @@ export default function PanelAdministracionPage() {
       return
     }
 
+    // Editando la cuenta propia se conserva el rol de la sesión: nadie se
+    // puede auto-relevar de administrador desde el formulario.
     const editandoCuentaPropia = Boolean(usuarioEditando && esUsuarioActual(usuarioEditando.correo))
 
     if (usuarioEditando) {
@@ -178,6 +185,7 @@ export default function PanelAdministracionPage() {
         rol: editandoCuentaPropia && usuario ? usuario.rol : formUsuario.rol,
         correo: formUsuario.correo.trim(),
       })
+      // La sesión guarda el correo anterior: hay que sincronizarla.
       if (editandoCuentaPropia) refrescarSesion()
       showToast('Usuario actualizado correctamente', 'success')
     } else {
@@ -265,12 +273,16 @@ export default function PanelAdministracionPage() {
     }
 
     if (productoEditando) {
+      // Lo ingresado en el formulario son cupos LIBRES: se suman los retenidos
+      // (carrito+reservado) para obtener el nuevo total del producto.
       actualizarProducto(productoEditando.codigo, {
         ...formProducto,
         cuposIniciales: formProducto.cuposIniciales + cuposRetenidos(productoEditando.codigo),
       })
       showToast('Producto actualizado correctamente', 'success')
     } else {
+      // Código único con prefijo de categoría (CN0457…); el while reintenta si
+      // por milagro el sufijo del timestamp ya existe.
       const prefijo = formProducto.tipo.charAt(0).toUpperCase() + formProducto.tipo.charAt(1)
       let codigo = `${prefijo}${Date.now().toString().slice(-4)}`
       while (buscarProductoPorCodigo(codigo)) {

@@ -1,5 +1,9 @@
+/**
+ * Validaciones reutilizables de formularios: contraseñas, correo institucional y edad.
+ */
 import { DOMINIO_CORREO } from '../constants'
 
+/** Contraseña válida: 8+ caracteres con mayúscula, minúscula y número. */
 export function validarContrasena(contrasena: string): boolean {
   return (
     /.{8,}/.test(contrasena) &&
@@ -9,10 +13,15 @@ export function validarContrasena(contrasena: string): boolean {
   )
 }
 
+/** true si el correo termina en el dominio institucional (`@duocuc.cl`). */
 export function esDominioDuoc(correo: string): boolean {
   return correo.trim().toLowerCase().endsWith(DOMINIO_CORREO)
 }
 
+/**
+ * Edad en años (con decimales) a partir de la fecha de nacimiento.
+ * 365.25: promedio que incorpora los años bisiestos.
+ */
 export function calcularEdad(fechaNacimiento: string): number {
   const fechaActual = new Date()
   const fechaIngresada = new Date(fechaNacimiento)

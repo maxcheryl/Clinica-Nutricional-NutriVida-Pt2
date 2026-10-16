@@ -1,3 +1,6 @@
+/**
+ * Pie de página estático: marca, enlaces de navegación y contacto.
+ */
 import { Link } from 'react-router-dom'
 
 export default function Footer() {

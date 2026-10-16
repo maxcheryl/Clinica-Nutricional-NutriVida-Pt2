@@ -1,3 +1,6 @@
+/**
+ * Estructura común de todas las páginas: Navbar + contenido de la ruta (Outlet) + Footer.
+ */
 import { Outlet } from 'react-router-dom'
 import Footer from './Footer'
 import Navbar from './Navbar'

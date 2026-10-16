@@ -1,3 +1,7 @@
+/**
+ * Catálogo sembrado de servicios (se inserta en localStorage la primera vez)
+ * + utilidades de presentación por categoría (badge e ícono).
+ */
 import type { Servicio } from '../types'
 
 export const servicios: Servicio[] = [

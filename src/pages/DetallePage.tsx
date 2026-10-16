@@ -1,3 +1,8 @@
+/**
+ * Ficha de un servicio: contenido editorial por tipo de servicio (con
+ * respaldo genérico), imagen del producto (o la default) y sidebar de
+ * reserva con control de cupos.
+ */
 import { useEffect, useMemo } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getBadgeClass, getTipoIcon } from '../data/servicios'
@@ -8,6 +13,8 @@ import Breadcrumb from '../layout/Breadcrumb'
 import { buscarProductoPorCodigo } from '../services/storage'
 import { formatPrecio } from '../utils/format'
 
+// Contenido de "qué incluye" por tipo de servicio; los tipos nuevos
+// (categorías creadas en los paneles) caen en la lista genérica.
 const QUE_INCLUYE_POR_TIPO: Record<string, string[]> = {
   Consulta: [
     'Evaluación antropométrica y anamnesis clínica completa.',

@@ -1,3 +1,7 @@
+/**
+ * Carrito de reservas: lista (tabla en desktop / cards en mobile) con precios
+ * frescos del catálogo, control de cupos por fila y confirmación de reserva.
+ */
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getBadgeClass, getTipoIcon } from '../data/servicios'
@@ -21,6 +25,8 @@ export default function CarritoPage() {
   const [modalLoginAbierto, setModalLoginAbierto] = useState(false)
   const [modalExitoAbierto, setModalExitoAbierto] = useState(false)
 
+  // Precio actual del catálogo (no el copiado al agregar): si el admin editó
+  // el producto, el total y los subtotales se recalculan con el valor vigente.
   const total = carrito.reduce((sum, s) => {
     const precio = buscarProductoPorCodigo(s.codigo)?.precio ?? s.precio
     return sum + precio * s.cantidad
@@ -49,6 +55,8 @@ export default function CarritoPage() {
       setModalLoginAbierto(true)
       return
     }
+    // Revalida cupos: negativo = el admin redujo el stock con estos ítems en
+    // el carrito; en ese caso se bloquea la confirmación para no sobre-reservar.
     const excedido = carrito.find((item) => cupoDisponible(item.codigo) < 0)
     if (excedido) {
       showToast(

@@ -1,3 +1,7 @@
+/**
+ * Contexto del carrito: mantiene en React el carrito y las reservas
+ * (persistidos en storage) y expone el cálculo de cupos libres por producto.
+ */
 import { createContext, useContext, useState } from 'react'
 import type { CarritoItem, ReservadosMap, Servicio } from '../types'
 import {
@@ -32,6 +36,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const totalUnidades = carrito.reduce((sum, item) => sum + item.cantidad, 0)
 
+  /**
+   * Cupos libres: lee el producto fresco de storage pero usa el carrito y
+   * las reservas del estado en memoria del contexto.
+   */
   function cupoDisponible(codigo: string): number {
     const servicio = buscarProductoPorCodigo(codigo)
     if (!servicio) return 0
@@ -60,7 +68,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCarrito([])
   }
 
-  // Réplica exacta: no valida carrito vacío ni revalida cupos
+  /**
+   * Confirma la reserva: suma el carrito a "reservados" y lo vacía.
+   * No revalida cupos aquí (lo hace CarritoPage antes de llamar).
+   */
   function confirmarReserva() {
     const nuevosReservados = { ...reservados }
     carrito.forEach((item) => {
@@ -72,6 +83,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCarrito([])
   }
 
+  /** Relee carrito y reservas desde storage (p. ej. tras eliminar un producto en un panel). */
   function sincronizar() {
     setCarrito(obtenerCarrito())
     setReservados(obtenerReservados())

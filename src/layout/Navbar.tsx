@@ -1,3 +1,7 @@
+/**
+ * Barra superior fija: enlaces principales, atajos a secciones del home,
+ * badge del carrito y menú de sesión/roles (panel, gestión, perfil, salir).
+ */
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
@@ -17,6 +21,10 @@ export default function Navbar() {
     setIsOpen(false)
   }, [location.pathname])
 
+  /**
+   * Sección del home: si ya estás en /, hace scroll suave;
+   * si no, navega a /#hash (HomePage la enfoca al montar).
+   */
   function irASeccion(hash: string) {
     if (location.pathname === '/') {
       document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' })

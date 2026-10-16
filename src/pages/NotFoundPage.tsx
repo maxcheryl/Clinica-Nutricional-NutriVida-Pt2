@@ -1,3 +1,4 @@
+/** 404: ruta inexistente (catch-all en App.tsx). */
 import { Link } from 'react-router-dom'
 
 export default function NotFoundPage() {

@@ -1,3 +1,7 @@
+/**
+ * Inicio de sesión: delega dominio, bloqueo por intentos y errores en
+ * AuthContext.iniciarSesion; aquí solo se muestra el mensaje devuelto.
+ */
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'

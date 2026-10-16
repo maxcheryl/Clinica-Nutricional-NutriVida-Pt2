@@ -1,3 +1,4 @@
+/** Destino de los guards StaffRoute/AdminRoute cuando el rol no alcanza. */
 import { Link } from 'react-router-dom'
 
 export default function AccesoDenegadoPage() {

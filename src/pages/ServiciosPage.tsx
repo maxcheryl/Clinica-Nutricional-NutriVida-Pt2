@@ -1,3 +1,7 @@
+/**
+ * Catálogo público: filtros combinados (categoría, precio y búsqueda libre),
+ * tarjetas de producto y alta de ítems al carrito revalidando cupos.
+ */
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PRECIO_MAX, PRECIO_MIN } from '../constants'
@@ -16,12 +20,15 @@ export default function ServiciosPage() {
 
   const productos = useMemo(() => obtenerProductos(), [])
   const categorias = useMemo(() => obtenerCategorias(), [])
+  // Tope del slider: el mayor entre el precio sembrado y los precios reales
+  // del catálogo, para que productos nuevos más caros sigan siendo filtrables.
   const precioTope = useMemo(
     () => Math.max(PRECIO_MAX, ...productos.map((p) => p.precio)),
     [productos],
   )
   const [filtroPrecioMax, setFiltroPrecioMax] = useState(precioTope)
 
+  // Filtros en cascada: categoría → precio máximo → búsqueda por texto libre.
   const filtrados = useMemo(() => {
     let lista =
       filtroTipo === 'todos' ? [...productos] : productos.filter((s) => s.tipo === filtroTipo)

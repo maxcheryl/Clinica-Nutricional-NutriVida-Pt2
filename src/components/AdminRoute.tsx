@@ -1,3 +1,7 @@
+/**
+ * Guard de rutas: solo administradores. Sin sesión → /login;
+ * sesión sin rol → /acceso-denegado.
+ */
 import type { ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'

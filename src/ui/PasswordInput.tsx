@@ -1,3 +1,7 @@
+/**
+ * Campo de contraseña con botón de mostrar/ocultar (ojo).
+ * `onChange` expone el valor crudo del input, no el evento.
+ */
 import { useState } from 'react'
 
 interface PasswordInputProps {

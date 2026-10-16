@@ -1,3 +1,8 @@
+/**
+ * Capa de persistencia: única fuente de verdad de la aplicación en localStorage.
+ * Todo pasa por aquí (usuarios, sesión, intentos, productos, categorías,
+ * carrito y reservas); los contextos solo reflejan estos datos en React.
+ */
 import {
   ADMIN_INICIAL_CORREO,
   ADMIN_INICIAL_PASSWORD,
@@ -14,6 +19,7 @@ import { servicios as serviciosSeed } from '../data/servicios'
 import type { CarritoItem, Categoria, IntentosMap, ReservadosMap, Servicio, Sesion, Usuario } from '../types'
 
 // ==================== USUARIOS ====================
+/** Lee todos los usuarios (normaliza `rol` a 'cliente' en registros antiguos sin rol). */
 export function obtenerUsuarios(): Usuario[] {
   const datos = localStorage.getItem(CLAVE_USUARIOS)
   if (datos === null) return []
@@ -21,25 +27,30 @@ export function obtenerUsuarios(): Usuario[] {
   return usuarios.map((u) => ({ ...u, rol: u.rol ?? 'cliente' }))
 }
 
+/** Reemplaza la lista completa de usuarios en localStorage. */
 export function guardarUsuarios(usuarios: Usuario[]): void {
   localStorage.setItem(CLAVE_USUARIOS, JSON.stringify(usuarios))
 }
 
+/** Agrega un usuario al final de la lista (no valida duplicados: eso lo hacen los formularios). */
 export function agregarUsuario(usuario: Usuario): void {
   const usuarios = obtenerUsuarios()
   usuarios.push(usuario)
   guardarUsuarios(usuarios)
 }
 
+/** Busca por correo sin importar mayúsculas/minúsculas. */
 export function buscarUsuarioPorCorreo(correo: string): Usuario | undefined {
   const usuarios = obtenerUsuarios()
   return usuarios.find((usuario) => usuario.correo.toLowerCase() === correo.toLowerCase())
 }
 
+/** Busca por id: se usa para refrescar la sesión sin depender del correo (evita colisiones). */
 export function buscarUsuarioPorId(id: string): Usuario | undefined {
   return obtenerUsuarios().find((usuario) => usuario.id === id)
 }
 
+/** Aplica un merge parcial sobre el usuario con ese correo (clave: correo original). */
 export function actualizarUsuario(correo: string, datos: Partial<Usuario>): void {
   const usuarios = obtenerUsuarios()
   const indice = usuarios.findIndex((u) => u.correo === correo)
@@ -48,11 +59,13 @@ export function actualizarUsuario(correo: string, datos: Partial<Usuario>): void
   guardarUsuarios(usuarios)
 }
 
+/** Elimina por correo (si hubiera duplicados, borría a todos). */
 export function eliminarUsuario(correo: string): void {
   const usuarios = obtenerUsuarios().filter((u) => u.correo !== correo)
   guardarUsuarios(usuarios)
 }
 
+/** One-time: completa el rol 'cliente' en usuarios guardados antes de existir roles. */
 export function migrarUsuariosSinRol(): void {
   const datos = localStorage.getItem(CLAVE_USUARIOS)
   if (datos === null) return
@@ -61,6 +74,7 @@ export function migrarUsuariosSinRol(): void {
   guardarUsuarios(migrados)
 }
 
+/** Crea el admin inicial si la lista de usuarios está vacía (al arrancar la app). */
 export function sembrarAdminSiFalta(): void {
   if (buscarUsuarioPorCorreo(ADMIN_INICIAL_CORREO)) return
   agregarUsuario({
@@ -78,6 +92,7 @@ export function sembrarAdminSiFalta(): void {
 }
 
 // ==================== SESIÓN ====================
+/** Devuelve la sesión persistida o null si no hay nadie logueado. */
 export function obtenerUsuarioLogueado(): Sesion | null {
   const datos = localStorage.getItem(CLAVE_SESION)
   if (datos === null) return null
@@ -93,6 +108,7 @@ export function borrarSesion(): void {
 }
 
 // ==================== INTENTOS FALLIDOS ====================
+/** Mapa correo → intentos fallidos, para bloquear cuentas después de MAX_INTENTOS. */
 export function obtenerIntentos(): IntentosMap {
   const datos = localStorage.getItem(CLAVE_INTENTOS)
   if (datos === null) return {}
@@ -103,6 +119,7 @@ export function guardarIntentos(intentos: IntentosMap): void {
   localStorage.setItem(CLAVE_INTENTOS, JSON.stringify(intentos))
 }
 
+/** Suma un intento fallido y marca la cuenta como bloqueada al llegar a MAX_INTENTOS. */
 export function incrementarIntentos(correo: string): void {
   const intentos = obtenerIntentos()
   if (!intentos[correo]) {
@@ -115,6 +132,7 @@ export function incrementarIntentos(correo: string): void {
   guardarIntentos(intentos)
 }
 
+/** Reinicia los contadores tras un login exitoso. */
 export function resetearIntentos(correo: string): void {
   const intentos = obtenerIntentos()
   if (intentos[correo]) {
@@ -129,6 +147,7 @@ export function estaBloqueado(correo: string): boolean {
   return Boolean(intentos[correo] && intentos[correo].bloqueado)
 }
 
+/** Cuántos intentos le quedan antes del bloqueo (MAX_INTENTOS si nunca falló). */
 export function obtenerIntentosRestantes(correo: string): number {
   const intentos = obtenerIntentos()
   if (!intentos[correo]) return MAX_INTENTOS
@@ -136,6 +155,7 @@ export function obtenerIntentosRestantes(correo: string): number {
 }
 
 // ==================== PRODUCTOS ====================
+/** Lee el catálogo; si está vacío, siembra los productos iniciales. */
 export function obtenerProductos(): Servicio[] {
   const datos = localStorage.getItem(CLAVE_PRODUCTOS)
   if (datos === null) {
@@ -155,6 +175,7 @@ export function agregarProducto(producto: Servicio): void {
   guardarProductos(productos)
 }
 
+/** Merge parcial por código; los campos no incluidos (p. ej. `imagen`) se conservan. */
 export function actualizarProducto(codigo: string, datos: Partial<Servicio>): void {
   const productos = obtenerProductos()
   const indice = productos.findIndex((p) => p.codigo === codigo)
@@ -163,6 +184,10 @@ export function actualizarProducto(codigo: string, datos: Partial<Servicio>): vo
   guardarProductos(productos)
 }
 
+/**
+ * Elimina el producto y limpia sus rastros: lo saca del carrito y borra
+ * sus reservas, para que no queden ítems fantasma de un código inexistente.
+ */
 export function eliminarProducto(codigo: string): void {
   guardarProductos(obtenerProductos().filter((p) => p.codigo !== codigo))
   guardarCarrito(obtenerCarrito().filter((i) => i.codigo !== codigo))
@@ -178,6 +203,7 @@ export function buscarProductoPorCodigo(codigo: string): Servicio | undefined {
 }
 
 // ==================== CATEGORÍAS ====================
+/** Categorías iniciales; los productos las referencian por `tipo` = nombre. */
 const CATEGORIAS_SEED: Categoria[] = [
   { id: crypto.randomUUID(), nombre: 'Consulta' },
   { id: crypto.randomUUID(), nombre: 'Plan especializado' },
@@ -204,6 +230,7 @@ export function agregarCategoria(nombre: string): void {
   guardarCategorias(categorias)
 }
 
+/** Renombra la categoría y arrastra el cambio a los productos que la usan (`tipo`). */
 export function actualizarCategoria(id: string, nombre: string): void {
   const categorias = obtenerCategorias()
   const indice = categorias.findIndex((c) => c.id === id)
@@ -221,6 +248,10 @@ export function actualizarCategoria(id: string, nombre: string): void {
   }
 }
 
+/**
+ * Elimina la categoría solo si ningún producto la usa.
+ * @returns false si estaba en uso (el caller muestra el motivo).
+ */
 export function eliminarCategoria(id: string): boolean {
   const categorias = obtenerCategorias()
   const categoria = categorias.find((c) => c.id === id)
@@ -242,6 +273,7 @@ export function guardarCarrito(carrito: CarritoItem[]): void {
   localStorage.setItem(CLAVE_CARRITO, JSON.stringify(carrito))
 }
 
+/** Agrega una unidad (o inserta con cantidad 1). La validación de cupos la hace el caller. */
 export function agregarAlCarrito(servicio: Servicio): void {
   const carrito = obtenerCarrito()
   const existe = carrito.find((item) => item.codigo === servicio.codigo)
@@ -253,6 +285,7 @@ export function agregarAlCarrito(servicio: Servicio): void {
   guardarCarrito(carrito)
 }
 
+/** Resta una unidad; al llegar a 0 elimina el ítem del carrito. */
 export function reducirCantidad(codigo: string): void {
   const carrito = obtenerCarrito()
   const item = carrito.find((i) => i.codigo === codigo)
@@ -275,12 +308,14 @@ export function vaciarCarrito(): void {
   localStorage.removeItem(CLAVE_CARRITO)
 }
 
+/** Unidades de un producto en el carrito (0 si no está). */
 export function cantidadEnCarrito(codigo: string): number {
   const item = obtenerCarrito().find((i) => i.codigo === codigo)
   return item ? item.cantidad : 0
 }
 
 // ==================== CUPOS ====================
+/** Mapa código → cupos ya reservados confirmados (tras "Confirmar reserva"). */
 export function obtenerReservados(): ReservadosMap {
   const datos = localStorage.getItem(CLAVE_RESERVADOS)
   if (datos === null) return {}
@@ -291,6 +326,10 @@ export function guardarReservados(reservados: ReservadosMap): void {
   localStorage.setItem(CLAVE_RESERVADOS, JSON.stringify(reservados))
 }
 
+/**
+ * Cupos libres de un producto: stock inicial − lo que hay en carrito − ya reservado.
+ * Puede ser negativo si el admin redujo el stock con ítems en carritos (el UI lo acota a 0).
+ */
 export function obtenerCupoDisponible(codigo: string): number {
   const servicio = buscarProductoPorCodigo(codigo)
   if (!servicio) return 0
@@ -299,6 +338,11 @@ export function obtenerCupoDisponible(codigo: string): number {
   return servicio.cuposIniciales - enCarrito - reservados
 }
 
+/**
+ * Cupos retenidos = carrito + reservados de un producto.
+ * Al editar stock desde los paneles, lo que se ingresa son cupos LIBRES,
+ * así que al guardar se le suma esto para obtener el nuevo `cuposIniciales`.
+ */
 export function cuposRetenidos(codigo: string): number {
   return cantidadEnCarrito(codigo) + (obtenerReservados()[codigo] || 0)
 }

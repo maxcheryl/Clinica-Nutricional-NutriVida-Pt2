@@ -1,7 +1,12 @@
+/**
+ * Miga de pan: el último ítem se muestra como página actual (sin enlace)
+ * y el primero lleva ícono de casa.
+ */
 import { Link } from 'react-router-dom'
 
 export interface BreadcrumbItem {
   label: string
+  /** Ruta del enlace; sin `to` (o en el último ítem) se renderiza como texto. */
   to?: string
 }
 

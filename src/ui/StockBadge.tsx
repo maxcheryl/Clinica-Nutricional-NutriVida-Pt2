@@ -1,6 +1,11 @@
+/**
+ * Badge de stock para tablas de administración: número de cupos libres
+ * + etiqueta contextual ("Agotado" si ≤0, "Pocos cupos" si ≤UMBRAL_POCOS_CUPOS).
+ */
 import { UMBRAL_POCOS_CUPOS } from '../constants'
 
 interface StockBadgeProps {
+  /** Cupos libres (ya acotados a ≥0 por el caller). */
   disponible: number
 }
 

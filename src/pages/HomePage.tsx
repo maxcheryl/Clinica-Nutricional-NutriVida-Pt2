@@ -1,3 +1,7 @@
+/**
+ * Home institucional: hero, sección "quiénes somos"/equipo, formulario de
+ * contacto (con validación propia) y CTA final.
+ */
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import AppModal from '../ui/AppModal'
@@ -20,6 +24,8 @@ export default function HomePage() {
     }
   }, [location.hash])
 
+  // Contacto: valida vacíos, largo mínimo del mensaje y dominio institucional;
+  // el formulario usa noValidate para que los errores salgan en el cuadrito rojo.
   function manejarContacto(e: FormEvent) {
     e.preventDefault()
     setErrorContacto(null)

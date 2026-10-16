@@ -1,3 +1,7 @@
+/**
+ * Guard de rutas: requiere sesión iniciada (cualquier rol);
+ * sin sesión redirige a /login.
+ */
 import type { ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'

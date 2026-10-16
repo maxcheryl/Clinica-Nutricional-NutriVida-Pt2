@@ -1,3 +1,7 @@
+/**
+ * Toast global de la app: `showToast(mensaje, tipo)` muestra una notificación
+ * flotante (bootstrap) abajo a la derecha durante 2,5 segundos.
+ */
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { Toast } from 'bootstrap'
 
